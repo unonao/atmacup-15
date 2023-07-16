@@ -1,0 +1,6 @@
+lr: 0.01
+embedding_dim: 128
+num_layers: 3
+num_epochs: 1000
+early_stopping: 20
+num_folds : 5

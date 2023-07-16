@@ -1,0 +1,16 @@
+defaults:
+  - _self_
+  - train: 000_baseline
+  - override hydra/job_logging: none # hydraで自動的にログファイルが生成されるのを防ぐ
+
+debug: False
+input_path : ../input/atmaCup15_dataset
+seed: 7
+
+hydra:
+  # hydraで自動的にログファイルが生成されるのを防ぐ
+  output_subdir: null
+  job:
+    chdir: False
+  run:
+    dir: .
