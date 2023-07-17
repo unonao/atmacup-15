@@ -169,7 +169,7 @@ def main(config: DictConfig) -> None:
         project="atmacup-21",
         name=exp_name,  # {file}_{id}
         mode="online" if config.debug is False else "disabled",
-        config=config.train,
+        config=OmegaConf.to_container(config.train),
     )
 
     oof_pred = np.zeros(len(train_df))

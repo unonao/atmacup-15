@@ -136,6 +136,32 @@ class OtherString(Feature):
         self.test = df[train.shape[0] :]
 
 
+class StringLen(Feature):
+    def create_features(self):
+        """
+        視聴した作品と類似タイトルがどれだけあるのかについて検索する
+        """
+        cols = ["producers", "licensors", "studios"]
+        df = features[["user_id"] + cols].copy()
+
+        def sort_and_join(s):
+            # split by comma, strip whitespace, sort, and rejoin
+            return ", ".join(sorted(x.strip() for x in s.split(",")))
+
+        use_cols = []
+        for col in cols:
+            new_col = f"{col}_len"
+            df[new_col] = df[col].fillna("Undefined").str.split(",").str.len()
+            use_cols.append(new_col)
+
+        df = df[use_cols]
+
+        df = cal_user_grouped_stats(df)
+
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
 class CategoricalLabelEncoded(Feature):
     def create_features(self):
         """
@@ -188,6 +214,42 @@ class UserNum(Feature):
         # 不要な特徴量を削除
         df = df.drop([f"members_norm_{agg_str}" for agg_str in ["max", "mean", "diff", "sum", "var", "min"]], axis=1)
         df = df.drop(["members_norm"], axis=1)
+        # 元の特徴も一応残す
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
+class UserNumSecond(Feature):
+    def create_features(self):
+        """
+        作品に関係する人数の特徴量
+        - {col}_norm (num): 全体の人数で考えたときの割合
+        """
+        df = features[user_num_cols].copy()
+
+        sum_num = df[user_num_cols].sum(axis=1)
+
+        for col in user_num_cols:
+            df[f"{col}_norm"] = df[col] / sum_num
+
+        df = cal_user_grouped_stats(df)
+
+        for i in range(len(user_num_cols)):
+            for j in range(i + 1, len(user_num_cols)):
+                col1 = user_num_cols[i]
+                col2 = user_num_cols[j]
+                if col1 == "members" or col2 == "members":
+                    continue
+                df[f"{col1}_div_{col2}"] = df[col1] / df[col2]
+                df[f"{col1}_prod_{col2}"] = df[f"{col1}_norm"] * df[f"{col2}_norm"]
+
+        # members_norm_max, members_norm_diff, members_norm_mean
+        # 不要な特徴量を削除
+        df = df.drop([f"members_norm_{agg_str}" for agg_str in ["max", "mean", "diff", "sum", "var", "min"]], axis=1)
+        df = df.drop(["members_norm"], axis=1)
+        df = df.drop(
+            ["members", "watching_count", "dropped_count", "dropped_norm_count", "plan_to_watch_norm_count"], axis=1
+        )
         # 元の特徴も一応残す
         self.train = df[: train.shape[0]]
         self.test = df[train.shape[0] :]
@@ -281,7 +343,7 @@ class Genres(Feature):
         # 不要な特徴量を削除
         for genre in unique_genres:
             df = df.drop([genre, f"{genre}_diff"], axis=1)
-        for agg_str in ["max", "min"]:
+        for agg_str in ["max", "min", "count", "sum"]:
             df = df.drop([f"genres_{agg_str}_score"], axis=1)
 
         print(df.head())

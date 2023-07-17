@@ -1,27 +1,20 @@
-id: lgb200_007
+id: lgb200_009
 
 feats:
   num:
     - duration_episodes #duration
     - genres
-    - user_num
+    - user_num_second
     - aired
     - japanese_name
     - other_string
+    - string_len
   cat:
     - categorical_label_encoded # categorical_label_encoded_with_user
   models:  # 学習済みモデルの結果を使う
-    - 020_surprise_unseen/2cea0176 # 1.563 CoClustering
     - 020_surprise_unseen/d97af2c0 # 1.441 KNNBaseline
-    - 020_surprise_unseen/78c0b3a2 # 1.563 SlopeOne
-    - 020_surprise_unseen/8275dac2 # 1.447 SVDpp
     - 020_surprise_unseen/5e4526f8 # 1.442 SVD
-    - 020_surprise_unseen/53aa74ea # 1.563 NMF
-    - 020_surprise_unseen/0ccfa6ae #1.563 KNNWithZScore
-    - 020_surprise_unseen/bda353f0 # 1.563 KNNWithMeans
-    - 020_surprise_unseen/72a42a50 # 1.563 KNNBasic
-    - 020_surprise_unseen/4ed7afa2 # 1.441 BaselineOnly
-
+    - 020_surprise_unseen/4ed7afa2 # 1.441
 
 target_name: score
 num_folds : 5
@@ -31,7 +24,7 @@ params:
   metric: rmse
   verbosity: -1
   boosting_type: gbdt
-  learning_rate: 0.1
+  learning_rate: 0.05
   num_leaves: 64
   min_child_samples: 160
   max_depth: -1
