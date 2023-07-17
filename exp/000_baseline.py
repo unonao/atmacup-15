@@ -1,3 +1,4 @@
+import gc
 import os
 import random
 import sys
@@ -12,8 +13,8 @@ import torch
 import torch.nn.functional as F
 import wandb
 from omegaconf import DictConfig, OmegaConf
-from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import StratifiedKFold
 from torch import Tensor
 from torch.nn import Embedding, ModuleList
 from torch.nn.modules.loss import _Loss
@@ -206,6 +207,10 @@ def main(config: DictConfig) -> None:
             oof_pred[val_idx.cpu().detach().numpy()] = model(data.edge_index[:, val_idx]).cpu().detach().numpy()
             test_pred = model(data.edge_index[:, test_idx]).cpu().detach().numpy()
             test_preds.append(test_pred)
+
+        del model, optimizer, pred, target
+        torch.cuda.empty_cache()
+        gc.collect()
 
     # calculate mean of predictions across all folds
     mean_test_preds = np.mean(test_preds, axis=0)

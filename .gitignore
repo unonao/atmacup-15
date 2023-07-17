@@ -4,6 +4,7 @@ input/
 output/
 *.pt
 *.pkl
+*.feather
 wandb
 
 # Byte-compiled / optimized / DLL files
