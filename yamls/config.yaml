@@ -5,7 +5,6 @@ defaults:
 
 debug: False
 input_path : ../input/atmaCup15_dataset
-interim_path : ../interim
 seed: 7
 
 hydra:
