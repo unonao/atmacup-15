@@ -107,6 +107,35 @@ class JapaneseName(Feature):
         self.test = df[train.shape[0] :]
 
 
+class OtherString(Feature):
+    def create_features(self):
+        """
+        視聴した作品と類似タイトルがどれだけあるのかについて検索する
+        """
+        cols = ["producers", "licensors", "studios"]
+        df = features[["user_id"] + cols].copy()
+
+        def sort_and_join(s):
+            # split by comma, strip whitespace, sort, and rejoin
+            return ", ".join(sorted(x.strip() for x in s.split(",")))
+
+        for col in cols:
+            df[col] = df[col].fillna("Undefined").apply(sort_and_join)
+
+        use_cols = []
+        for col in cols:
+            for scorer in ["partial", "else"]:
+                for aggway in ["sum", "mean", "var", "max"]:
+                    new_col = f"{col}_{scorer}_{aggway}"
+                    print(new_col)
+                    use_cols.append(new_col)
+                    df[new_col] = df.groupby("user_id")[col].transform(calculate_csim, aggway, scorer)
+
+        df = df[use_cols]
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
 class CategoricalLabelEncoded(Feature):
     def create_features(self):
         """

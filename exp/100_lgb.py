@@ -87,6 +87,7 @@ def main(config: DictConfig) -> None:
 
         # importance
         """
+        """
         importance = pd.DataFrame(
             model_lgb.feature_importance(importance_type="gain"), index=X_train_all.columns, columns=["importance"]
         )
@@ -95,7 +96,6 @@ def main(config: DictConfig) -> None:
         print(importance.head())
         print("tail importance")
         print(importance.tail())
-        """
     mean_y_preds = np.mean(y_preds, axis=0)
 
     # 範囲内にする
