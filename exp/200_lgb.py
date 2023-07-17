@@ -1,4 +1,4 @@
-"""for seen"""
+"""for unseen"""
 import os
 import random
 import sys
@@ -12,7 +12,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 import os
 import sys
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import GroupKFold
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
@@ -35,7 +35,7 @@ def main(config: DictConfig) -> None:
     os.makedirs(output_path, exist_ok=True)
 
     wandb.init(
-        project="atmacup-21",
+        project="atmacup-21-unseen",
         name=exp_name,
         mode="online" if config.debug is False else "disabled",
         config=config.train,
@@ -44,20 +44,22 @@ def main(config: DictConfig) -> None:
     # 指定した特徴量からデータをロード
     X_train_all, X_test = load_datasets(config.lgb.feats)
     y_train_all = load_target(config.lgb.target_name)
+    train_user_ids = load_target("user_id")
     sub = load_sample_sub()
 
     if config.debug:
         sample_index = X_train_all.sample(100).index
         X_train_all = X_train_all.iloc[sample_index].reset_index(drop=True)
         y_train_all = y_train_all.iloc[sample_index].reset_index(drop=True)
+        train_user_ids = train_user_ids.iloc[sample_index].reset_index(drop=True)
         X_test = X_test.head(100)
         sub = sub.head(100)
 
     oof_pred = np.zeros(X_train_all.shape[0])
     y_preds = []
 
-    kf = StratifiedKFold(n_splits=config.lgb.num_folds, shuffle=True, random_state=config.seed)
-    for fold, (train_index, valid_index) in enumerate(kf.split(X_train_all, y_train_all)):
+    kf = GroupKFold(n_splits=config.lgb.num_folds)
+    for fold, (train_index, valid_index) in enumerate(kf.split(X_train_all, y_train_all, train_user_ids)):
         X_train, X_valid = (X_train_all.iloc[train_index, :], X_train_all.iloc[valid_index, :])
         y_train, y_valid = (y_train_all.iloc[train_index], y_train_all.iloc[valid_index])
 
@@ -105,7 +107,7 @@ def main(config: DictConfig) -> None:
     # CVスコア確認
     print("===CV scores===")
     rmse_all_valid = evaluate_score(y_train_all, oof_pred, "rmse")
-    wandb.log({f"oof_rmse": rmse_all_valid})
+    wandb.log({f"rmse/all_val": rmse_all_valid})
 
     # 保存
     oof_df = pd.DataFrame({"score": oof_pred})

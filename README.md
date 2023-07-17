@@ -29,4 +29,5 @@ cd exp
 python 000_baseline.py  train.embedding_dim=6000 train.num_layers=5
 
 python 001_lightgcn_agg.py debug=True train=train001
+python 200_lgb.py lgb=lgb200
 """
