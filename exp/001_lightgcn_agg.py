@@ -4,6 +4,7 @@ import sys
 import uuid
 from pathlib import Path
 from typing import Optional, Union
+import warnings
 
 import hydra
 import numpy as np
@@ -22,6 +23,8 @@ from torch_geometric.nn.conv import LGConv
 from torch_geometric.typing import Adj, OptTensor
 from torch_geometric.utils import is_sparse, to_edge_index
 from tqdm.auto import tqdm
+
+warnings.simplefilter("ignore")  # torch scatter が早いよって警告がでる
 
 
 class LightGCN(torch.nn.Module):
@@ -163,6 +166,7 @@ def main(config: DictConfig) -> None:
             num_nodes=data.num_nodes,
             embedding_dim=config.train.embedding_dim,
             num_layers=config.train.num_layers,
+            aggr=config.train.aggr,
         ).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=config.train.lr)
         best_val_loss = float("inf")

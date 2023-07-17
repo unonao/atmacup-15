@@ -1,9 +1,14 @@
+"""
+# testにのみ出現するユーザーについては辺の重みをゼロにする
+"""
+
 import os
 import random
 import sys
 import uuid
 from pathlib import Path
 from typing import Optional, Union
+import shutil
 
 import hydra
 import numpy as np
@@ -22,6 +27,7 @@ from torch_geometric.nn.conv import LGConv
 from torch_geometric.typing import Adj, OptTensor
 from torch_geometric.utils import is_sparse, to_edge_index
 from tqdm.auto import tqdm
+import torch.nn as nn
 
 
 class LightGCN(torch.nn.Module):
@@ -51,6 +57,8 @@ class LightGCN(torch.nn.Module):
         self.embedding = Embedding(num_nodes, embedding_dim)
         self.convs = ModuleList([LGConv(**kwargs) for _ in range(num_layers)])
 
+        self.fc1 = nn.Linear(embedding_dim * 2, 64)  # 2つの埋め込みを連結するため、*2 が必要
+        self.fc2 = nn.Linear(64, 1)
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -91,7 +99,10 @@ class LightGCN(torch.nn.Module):
         out_src = out[edge_label_index[0]]
         out_dst = out[edge_label_index[1]]
 
-        return (out_src * out_dst).sum(dim=-1)
+        x = torch.cat((out_src, out_dst), dim=1)
+        x = F.relu(self.fc1(x))  # 中間層の活性化関数にReLUを用いる
+        x = self.fc2(x)  # 回帰問題なので、出力層の活性化関数は不要
+        return torch.squeeze(x)
 
 
 def seed_everything(seed=1234):
@@ -131,7 +142,7 @@ def main(config: DictConfig) -> None:
     train_df = pd.read_csv(Path(config.input_path) / "train.csv")
     test_df = pd.read_csv(Path(config.input_path) / "test.csv")
     sample_submission_df = pd.read_csv(Path(config.input_path) / "sample_submission.csv")
-    anime_df = pd.read_csv(Path(config.input_path) / "anime.csv")
+    # anime_df = pd.read_csv(Path(config.input_path) / "anime.csv")
 
     # make Data
     all_df = pd.concat([train_df[["user_id", "anime_id"]], test_df[["user_id", "anime_id"]]]).reset_index(drop=True)
@@ -144,8 +155,14 @@ def main(config: DictConfig) -> None:
     num_nodes = len(user_idx) + len(anime_idx)
     edges = all_df[["user_label", "anime_label"]].to_numpy()
     edge_index = torch.tensor(edges.T, dtype=torch.long).contiguous()
-    data = Data(num_nodes=num_nodes, edge_index=edge_index).to(device)
+    data = Data(num_nodes=num_nodes, edge_index=edge_index)
+
     data.edge_weight = torch.ones(len(all_df)).contiguous()
+    # testにのみ出現するユーザーについては重みをゼロにする
+    test_only_index = all_df[~all_df["user_label"].isin(all_df.loc[len(train_df) :, "user_label"].unique())].index
+    data.edge_weight[test_only_index] = 0.0
+
+    data = data.to(device)
 
     # 学習
     wandb.init(
@@ -157,6 +174,55 @@ def main(config: DictConfig) -> None:
 
     oof_pred = np.zeros(len(train_df))
     test_preds = []
+
+    for fold, (train_idx, val_idx, test_idx) in enumerate(zip(*k_fold(config.train.num_folds, all_df))):
+        model = LightGCN(
+            num_nodes=data.num_nodes,
+            embedding_dim=config.train.embedding_dim,
+            num_layers=config.train.num_layers,
+        ).to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=config.train.lr)
+        best_val_loss = float("inf")
+        early_stopping_counter = 0
+
+        for epoch in tqdm(range(config.train.num_epochs if config.debug is False else 6), desc=f"Fold-{fold+1}"):
+            # train
+            model.train()
+            optimizer.zero_grad()
+            pred = model(data.edge_index[:, train_idx])
+            target = torch.tensor(train_df.loc[train_idx.numpy(), "score"].to_numpy()).float().to(device)
+            loss = F.mse_loss(pred, target).sqrt()
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            # validation
+            with torch.no_grad():
+                pred = model(data.edge_index[:, val_idx])
+                target = torch.tensor(train_df.loc[val_idx.numpy(), "score"].to_numpy()).float().to(device)
+                val_loss = F.mse_loss(pred, target).sqrt()
+            wandb.log(
+                {"epoch": epoch, f"loss/train/fold-{fold}": loss.item(), f"loss/valid/fold-{fold}": val_loss.item()}
+            )
+            if epoch % config.train.early_stopping == 0:
+                tqdm.write(f"Epoch: {epoch}, Loss: {loss.item()}, Val Loss: {val_loss.item()}")
+
+            # early stopping
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                torch.save(model.state_dict(), output_path / f"model_best_{fold}.pt")
+                early_stopping_counter = 0
+            else:
+                early_stopping_counter += 1
+                if early_stopping_counter >= config.train.early_stopping:
+                    model.load_state_dict(torch.load(output_path / f"model_best_{fold}.pt"))
+                    break
+
+        # testing
+        with torch.no_grad():
+            oof_pred[val_idx.cpu().detach().numpy()] = model(data.edge_index[:, val_idx]).cpu().detach().numpy()
+            test_pred = model(data.edge_index[:, test_idx]).cpu().detach().numpy()
+            test_preds.append(test_pred)
 
     for fold, (train_idx, val_idx, test_idx) in enumerate(zip(*k_fold(config.train.num_folds, all_df))):
         model = LightGCN(
@@ -224,6 +290,9 @@ def main(config: DictConfig) -> None:
 
     oof_df = pd.DataFrame({"score": oof_pred})
     oof_df.to_csv(output_path / "oof.csv", index=False)
+
+    if config.debug:
+        shutil.rmtree(output_path)
 
 
 if __name__ == "__main__":
