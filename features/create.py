@@ -65,6 +65,23 @@ class CategoricalLabelEncoded(Feature):
         self.test = df[train.shape[0] :]
 
 
+class CategoricalLabelEncodedWithUser(Feature):
+    def create_features(self):
+        """
+        categorical_features をラベルエンコードした特徴量。user_id付き
+        """
+        use_features = categorical_features + ["user_id"]
+        df = features[use_features].copy()
+        les = []
+        for col in use_features:
+            le = LabelEncoder()
+            le.fit(df[col].fillna(""))
+            df[col] = le.transform(df[col].fillna(""))
+            les.append(le)
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
 class UserNum(Feature):
     def create_features(self):
         """

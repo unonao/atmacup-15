@@ -1,5 +1,10 @@
 # atmacup-21
 
+- 000(seen): LightGCN系
+- 100(seen): lgb
+- 200(unseen): lgb
+- 300: stacking
+
 """sh
 docker compose run kaggle bash
 docker compose up
@@ -11,6 +16,12 @@ input/atmaCup15_dataset にデータを配置
 """sh
 cd scripts/
 python convert_to_feather.py
+"""
+
+feature create
+"""sh
+cd features
+python create.py
 """
 
 """sh
