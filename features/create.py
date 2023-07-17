@@ -49,6 +49,50 @@ def cal_user_grouped_stats(df) -> pd.DataFrame:
     return _df
 
 
+from rapidfuzz.distance import DamerauLevenshtein, Postfix, Prefix
+from rapidfuzz.process import cdist
+
+
+class JapaneseName(Feature):
+    def create_features(self):
+        """
+        視聴した作品と類似タイトルがどれだけあるのかについて検索する
+        """
+        df = features[["user_id", "japanese_name"]].copy()
+
+        def calculate_csim(df, aggway="sum", scorer="prefix"):
+            queries = df
+            scorer = None
+            if scorer == "prefix":
+                scorer = Prefix.normalized_distance
+            elif scorer == "prefix":
+                scorer = Postfix.normalized_distance
+            else:
+                scorer = DamerauLevenshtein.normalized_distance
+            score = cdist(queries, queries, scorer=Prefix.normalized_distance)
+            result_df = pd.DataFrame(score, index=queries, columns=queries)
+            result_df = 1 - result_df  # distanceなので反転
+            if aggway == "sum":
+                result = result_df.sum(axis=1)
+            elif aggway == "mean":
+                result = result_df.mean(axis=1)
+            elif aggway == "var":
+                result = result_df.var(axis=1)
+            return result.to_numpy()
+
+        use_cols = []
+        for scorer in ["prefix", "postfix", "else"]:
+            for aggway in ["sum", "mean", "var"]:
+                col = f"{scorer}_{aggway}"
+                print(col)
+                use_cols.append(col)
+                df[col] = df.groupby("user_id")["japanese_name"].transform(calculate_csim, aggway, scorer)
+
+        df = df[use_cols]
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
 class CategoricalLabelEncoded(Feature):
     def create_features(self):
         """

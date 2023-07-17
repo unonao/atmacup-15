@@ -12,6 +12,6 @@ RUN python3 -m pip install --upgrade pip \
     ipywidgets==7.7.5
 
 RUN pip install --no-cache-dir \
-    obonet pyvis hydra-core
+    hydra-core textdistance
 RUN pip install torch_geometric
 RUN pip install git+https://github.com/unonao/kamiggle.git
