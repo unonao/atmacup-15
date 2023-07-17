@@ -75,8 +75,8 @@ class Feature(metaclass=ABCMeta):
         raise NotImplementedError
 
     def save(self):
-        self.train.to_feather(str(self.train_path))
-        self.test.to_feather(str(self.test_path))
+        self.train.reset_index(drop=True).to_feather(str(self.train_path))
+        self.test.reset_index(drop=True).to_feather(str(self.test_path))
 
     def load(self):
         self.train = pd.read_feather(str(self.train_path))

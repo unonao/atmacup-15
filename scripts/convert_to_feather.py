@@ -1,14 +1,12 @@
+import os
+from pathlib import Path
+
 import hydra
 import numpy as np
 import pandas as pd
 from omegaconf import DictConfig, OmegaConf
-from pathlib import Path
-import os
 
-target = [
-    "train",
-    "test",
-]
+target = ["train", "test", "anime", "sample_submission"]
 
 extension = "csv"
 
