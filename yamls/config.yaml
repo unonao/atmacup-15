@@ -2,6 +2,7 @@ defaults:
   - _self_
   - train: 000_baseline
   - lgb: lgb100
+  - combine: combine300
   - override hydra/job_logging: none # hydraで自動的にログファイルが生成されるのを防ぐ
 
 debug: False
