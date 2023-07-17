@@ -51,6 +51,40 @@ def cal_user_grouped_stats(df) -> pd.DataFrame:
 
 from rapidfuzz.distance import DamerauLevenshtein, Postfix, Prefix
 from rapidfuzz.process import cdist
+from rapidfuzz.fuzz import partial_ratio
+
+
+def calculate_csim(df, aggway="sum", scorer="prefix"):
+    """
+    文字列の類似度を測る。transformで使うために用いる
+    """
+    queries = df
+    if scorer == "partial":
+        score = cdist(queries, queries, scorer=partial_ratio)
+        result_df = pd.DataFrame(score, index=queries, columns=queries) / 100
+        result = result_df.to_numpy()
+        np.fill_diagonal(result, 0.0)  # 自身は0にする
+    else:
+        if scorer == "prefix":
+            scorer = Prefix.normalized_distance
+        elif scorer == "prefix":
+            scorer = Postfix.normalized_distance
+        else:
+            scorer = DamerauLevenshtein.normalized_distance
+        score = cdist(queries, queries, scorer=Prefix.normalized_distance)
+        result_df = pd.DataFrame(score, index=queries, columns=queries)
+        result_df = 1 - result_df  # distanceなので反転
+        result = result_df.to_numpy()
+        np.fill_diagonal(result, 0.0)  # 自身は0にする
+    if aggway == "sum":
+        result = np.sum(result, axis=1)
+    elif aggway == "mean":
+        result = np.mean(result, axis=1)
+    elif aggway == "var":
+        result = np.var(result, axis=1)
+    elif aggway == "max":
+        result = np.max(result, axis=1)
+    return result
 
 
 class JapaneseName(Feature):
@@ -60,29 +94,9 @@ class JapaneseName(Feature):
         """
         df = features[["user_id", "japanese_name"]].copy()
 
-        def calculate_csim(df, aggway="sum", scorer="prefix"):
-            queries = df
-            scorer = None
-            if scorer == "prefix":
-                scorer = Prefix.normalized_distance
-            elif scorer == "prefix":
-                scorer = Postfix.normalized_distance
-            else:
-                scorer = DamerauLevenshtein.normalized_distance
-            score = cdist(queries, queries, scorer=Prefix.normalized_distance)
-            result_df = pd.DataFrame(score, index=queries, columns=queries)
-            result_df = 1 - result_df  # distanceなので反転
-            if aggway == "sum":
-                result = result_df.sum(axis=1)
-            elif aggway == "mean":
-                result = result_df.mean(axis=1)
-            elif aggway == "var":
-                result = result_df.var(axis=1)
-            return result.to_numpy()
-
         use_cols = []
-        for scorer in ["prefix", "postfix", "else"]:
-            for aggway in ["sum", "mean", "var"]:
+        for scorer in ["partial", "prefix", "postfix", "else"]:
+            for aggway in ["sum", "mean", "var", "max"]:
                 col = f"{scorer}_{aggway}"
                 print(col)
                 use_cols.append(col)

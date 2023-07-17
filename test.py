@@ -3,3 +3,4 @@ def print_score(seen, unseen):
 
 
 print_score(1.143132400409859, 1.4139537431522253)
+print_score(1.13924, 1.4139537431522253)
