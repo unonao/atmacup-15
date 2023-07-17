@@ -38,7 +38,7 @@ def main(config: DictConfig) -> None:
         project="atmacup-21-unseen",
         name=exp_name,
         mode="online" if config.debug is False else "disabled",
-        config=config.train,
+        config=OmegaConf.to_container(config.lgb),
     )
 
     # 指定した特徴量からデータをロード
@@ -89,6 +89,7 @@ def main(config: DictConfig) -> None:
 
         # importance
         """
+        """
         importance = pd.DataFrame(
             model_lgb.feature_importance(importance_type="gain"), index=X_train_all.columns, columns=["importance"]
         )
@@ -97,7 +98,6 @@ def main(config: DictConfig) -> None:
         print(importance.head())
         print("tail importance")
         print(importance.tail())
-        """
     mean_y_preds = np.mean(y_preds, axis=0)
 
     # 範囲内にする

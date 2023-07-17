@@ -338,6 +338,38 @@ class DurationEpisodes(Feature):
         self.test = df[train.shape[0] :]
 
 
+import sys
+
+sys.path.append(os.pardir)
+from utils import load_datasets
+import cuml
+
+
+class PcaTwenty(Feature):
+    def create_features(self):
+        """ """
+        conf = OmegaConf.create(
+            {
+                "num": ["duration_episodes", "genres", "user_num", "aired", "japanese_name", "other_string"],
+                "cat": [],
+                "models": [],
+            }
+        )
+        n = 20
+
+        X_train_all, X_test = load_datasets(conf)
+        X = pd.concat([X_train_all, X_test])
+        print(X.shape)
+        X = X.astype(float)
+        X = (X - X.mean(axis=0)) / X.std(axis=0)
+        X = X.fillna(0)
+        pca = cuml.PCA(n_components=n)
+        Z_pca = pca.fit_transform(X)
+        df = pd.DataFrame(Z_pca, columns=[f"pca{i}" for i in range(n)])
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
 if __name__ == "__main__":
     args = get_arguments()
 

@@ -38,7 +38,7 @@ def main(config: DictConfig) -> None:
         project="atmacup-21-unseen",
         name=exp_name,
         mode="online" if config.debug is False else "disabled",
-        config=config.train,
+        config=OmegaConf.to_container(config.lgb),
     )
 
     # 指定した特徴量からデータをロード

@@ -1,0 +1,3 @@
+target_name: score
+num_folds : 5
+model: SVD
