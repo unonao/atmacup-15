@@ -18,8 +18,15 @@ sys.path.append(os.pardir)
 from utils import load_datasets, load_target, evaluate_score, load_sample_sub
 
 
+def seed_everything(seed=1234):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+
+
 @hydra.main(version_base=None, config_path="../yamls", config_name="config")
 def main(config: DictConfig) -> None:
+    seed_everything()
     exp_name = f"{Path(sys.argv[0]).stem}/{str(uuid.uuid1())[:8]}"
     output_path = Path(f"../output/{exp_name}")
     os.makedirs(output_path, exist_ok=True)
@@ -65,6 +72,7 @@ def main(config: DictConfig) -> None:
         print({f"rmse/fold{fold}": rmse_valid})
 
         # importance
+        """
         importance = pd.DataFrame(
             model_lgb.feature_importance(importance_type="gain"), index=X_train_all.columns, columns=["importance"]
         )
@@ -73,6 +81,7 @@ def main(config: DictConfig) -> None:
         print(importance.head())
         print("tail importance")
         print(importance.tail())
+        """
 
     mean_y_preds = np.mean(y_preds, axis=0)
 

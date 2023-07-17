@@ -97,6 +97,10 @@ class UserNum(Feature):
 
         df = cal_user_grouped_stats(df)
 
+        # members_norm_max, members_norm_diff, members_norm_mean
+        # 不要な特徴量を削除
+        df = df.drop([f"members_norm_{agg_str}" for agg_str in ["max", "mean", "diff", "sum", "var", "min"]], axis=1)
+        df = df.drop(["members_norm"], axis=1)
         # 元の特徴も一応残す
         self.train = df[: train.shape[0]]
         self.test = df[train.shape[0] :]
@@ -156,6 +160,15 @@ class Genres(Feature):
         for agg_str in agg_func_list:
             for genre in unique_genres:
                 df[f"genres_{agg_str}_score"] += df[genre] * (1 / df["genres_num"]) * df[f"{genre}_{agg_str}"]
+                # 不要な特徴量を削除
+                df = df.drop([f"{genre}_{agg_str}"], axis=1)
+
+        # 不要な特徴量を削除
+        for genre in unique_genres:
+            df = df.drop([genre, f"{genre}_diff"], axis=1)
+        for agg_str in ["max", "min"]:
+            df = df.drop([f"genres_{agg_str}_score"], axis=1)
+
         print(df.head())
         self.train = df[: train.shape[0]]
         self.test = df[train.shape[0] :]
