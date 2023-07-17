@@ -218,6 +218,34 @@ class Aired(Feature):
         self.test = df[train.shape[0] :]
 
 
+class AiredWithEnd(Feature):
+    def create_features(self):
+        """
+        - start_year(num): 公開された年
+        """
+        df = features[["aired"]].copy()
+        date_df = pd.DataFrame()
+        date_df[["start_date", "end_date"]] = df["aired"].str.split(" to ", expand=True)
+
+        # 年だけを取得するための関数定義
+        def get_year(date_str):
+            try:
+                return pd.to_datetime(date_str).year
+            except:
+                return None
+
+        df["end_year"] = date_df["end_date"].apply(get_year)
+        df["start_year"] = date_df["start_date"].apply(get_year)
+        df["diff_year"] = df["start_year"] - df["end_year"]
+
+        df = df.drop(["aired"], axis=1)
+
+        df = cal_user_grouped_stats(df)
+
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
 class Genres(Feature):
     def create_features(self):
         """
@@ -261,30 +289,47 @@ class Genres(Feature):
         self.test = df[train.shape[0] :]
 
 
+def convert_to_minutes(s):
+    if "hr. " in s and "min." in s:
+        # 'hr.'と'min.'が含まれる場合、時間と分を分に変換
+        hrs, mins = s.split(" hr. ")
+        return int(hrs) * 60 + int(mins.split(" min.")[0])
+    elif "hr." in s:
+        # 'hr.'のみが含まれる場合、時間を分に変換
+        return int(s.split(" hr.")[0]) * 60
+    elif "min. per ep." in s:
+        # 'min. per ep.'が含まれる場合、エピソードあたりの時間を取得
+        return int(s.split(" min. per ep.")[0])
+    elif "min." in s:
+        # 'min.'が含まれる場合、そのまま分を取得
+        return int(s.split(" min.")[0])
+    else:
+        # 上記のいずれにも該当しない場合、NaNにする
+        return np.nan
+
+
 class Duration(Feature):
     def create_features(self):
         df = features[["duration"]].copy()
-
-        def convert_to_minutes(s):
-            if "hr. " in s and "min." in s:
-                # 'hr.'と'min.'が含まれる場合、時間と分を分に変換
-                hrs, mins = s.split(" hr. ")
-                return int(hrs) * 60 + int(mins.split(" min.")[0])
-            elif "hr." in s:
-                # 'hr.'のみが含まれる場合、時間を分に変換
-                return int(s.split(" hr.")[0]) * 60
-            elif "min. per ep." in s:
-                # 'min. per ep.'が含まれる場合、エピソードあたりの時間を取得
-                return int(s.split(" min. per ep.")[0])
-            elif "min." in s:
-                # 'min.'が含まれる場合、そのまま分を取得
-                return int(s.split(" min.")[0])
-            else:
-                # 上記のいずれにも該当しない場合、NaNにする
-                return np.nan
-
         # 'duration'列に適用
         df["duration_in_minutes"] = df["duration"].apply(convert_to_minutes)
+
+        df = df.drop(["duration"], axis=1)
+
+        df = cal_user_grouped_stats(df)
+
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
+class DurationEpisodes(Feature):
+    def create_features(self):
+        df = features[["duration", "episodes"]].copy()
+        df.loc[df["episodes"] == "Unknown", "episodes"] = np.nan
+        df["episodes"] = df["episodes"].astype(float)
+        df["duration_in_minutes"] = df["duration"].apply(convert_to_minutes)
+        df["total_len"] = df["duration_in_minutes"] * df["episodes"]
+
         df = df.drop(["duration"], axis=1)
 
         df = cal_user_grouped_stats(df)
