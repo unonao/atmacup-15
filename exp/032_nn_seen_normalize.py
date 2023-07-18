@@ -16,7 +16,7 @@ import shutil
 from tqdm.auto import tqdm
 
 sys.path.append(os.pardir)
-from utils import load_datasets, load_target, evaluate_score, load_sample_sub
+from utils import load_datasets_for_nn, load_target, evaluate_score, load_sample_sub
 
 
 # 同様のランダムシード設定関数
@@ -72,25 +72,6 @@ class MyNet(nn.Module):
 
 
 import pandas as pd
-from cuml.preprocessing import StandardScaler
-
-
-def prepare_data(X_train_all, X_test):
-    # データ結合
-    combined_df = pd.concat([X_train_all, X_test], axis=0)
-
-    # 欠損値の平均値で埋める
-    combined_df_filled = combined_df.fillna(combined_df.mean())
-
-    # 正規化
-    scaler = StandardScaler()
-    combined_df_normalized = pd.DataFrame(scaler.fit_transform(combined_df_filled), columns=combined_df_filled.columns)
-
-    # 結果のデータフレームを分割して返す
-    X_train_processed = combined_df_normalized[: len(X_train_all)]
-    X_test_processed = combined_df_normalized[len(X_train_all) :]
-
-    return X_train_processed, X_test_processed
 
 
 # メインの学習ループ
@@ -110,7 +91,7 @@ def main(config: DictConfig) -> None:
     )
 
     # 指定した特徴量からデータをロード
-    X_train_all, X_test = load_datasets(config.nn.feats)
+    X_train_all, X_test = load_datasets_for_nn(config.nn.feats)
     y_train_all = load_target(config.nn.target_name)
     train_user_ids = load_target("user_id")
     sub = load_sample_sub()
@@ -122,7 +103,6 @@ def main(config: DictConfig) -> None:
         train_user_ids = train_user_ids.iloc[sample_index].reset_index(drop=True)
         X_test = X_test.head(100)
         sub = sub.head(100)
-    X_train_all, X_test = prepare_data(X_train_all, X_test)
 
     oof_pred = np.zeros(X_train_all.shape[0])
     test_preds = []

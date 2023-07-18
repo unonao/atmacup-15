@@ -21,7 +21,7 @@ import cuml
 
 sys.path.append(os.pardir)
 from utils import load_datasets
-
+from utils.embedding import TextEmbedder
 
 Feature.dir = "."
 label_feature = "score"
@@ -99,6 +99,29 @@ def calculate_csim(df, aggway="sum", scorer="prefix"):
     elif aggway == "max":
         result = np.max(result, axis=1)
     return result
+
+
+class TextEmbedding(Feature):
+    def create_features(self):
+        """
+        言語モデルによる埋込情報と、同一user_id内でのコサイン類似度の統計量を算出する
+        """
+        # 文字列として扱う列を結合し、元の列を落とす
+        concat_feature = ["japanese_name", "genres", "producers", "licensors", "studios", "rating"]
+        anime_df = anime[concat_feature].copy()
+        # スペース区切りで結合する
+        anime_df[concat_feature] = anime_df[concat_feature].astype(str)
+        anime_df["combined_features"] = anime_df[concat_feature].agg(" ".join, axis=1)
+        embedder = TextEmbedder()
+        anime_embeddings = embedder.get_embeddings(anime_df["combined_features"].values.tolist())
+
+        df = features[["anime_id"]].copy()
+        # anime の何行目にあるのかを求める
+        df["row_number"] = df["anime_id"].map(anime[["anime_id"]].copy().reset_index().set_index("anime_id")["index"])
+        embeddings = anime_embeddings[df["row_number"]]
+        embeddings_df = pd.DataFrame(embeddings, columns=[f"embedding_{i}" for i in range(embeddings.shape[1])])
+        self.train = embeddings_df[: train.shape[0]]
+        self.test = embeddings_df[train.shape[0] :]
 
 
 class JapaneseName(Feature):

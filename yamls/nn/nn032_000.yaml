@@ -9,12 +9,13 @@ feats:
     - japanese_name
     - other_string
     - string_len
+  cat: []
+  norm:
+    - text_embedding
+    - multi_hot_features
     - implicit_factors
     - implicit_factors_logistic_matrix_factor
     - implicit_factors_bpr
-    - multi_hot_features
-    - categorical_label_encoded_with_user
-  cat: []
   models:  # 学習済みモデルの結果を使う
     - 010_surprise/4b84f9aa # 1.191 SVDpp
     - 010_surprise/277704d6 # 1.203 SVD

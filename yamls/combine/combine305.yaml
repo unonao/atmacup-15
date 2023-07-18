@@ -1,5 +1,5 @@
 seen:
-  - 100_lgb/931bf0f0 # 1.129 lgb
+  - 100_lgb/b0c41ab8 # 1.125 lgb
   - 000_baseline/8d9ed97c # 1.156 LightGCN
   - 031_nn_seen_scheduler/60d2e178 # 1.165 NN
   - 010_surprise/4b84f9aa # 1.191 SVDpp
