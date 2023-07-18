@@ -58,6 +58,7 @@ def main(config: DictConfig) -> None:
 
     kf = StratifiedKFold(n_splits=config.lgb.num_folds, shuffle=True, random_state=config.seed)
     for fold, (train_index, valid_index) in enumerate(kf.split(X_train_all, y_train_all)):
+        print(f"\nFold {fold}")
         X_train, X_valid = (X_train_all.iloc[train_index, :], X_train_all.iloc[valid_index, :])
         y_train, y_valid = (y_train_all.iloc[train_index], y_train_all.iloc[valid_index])
 

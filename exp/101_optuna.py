@@ -48,6 +48,7 @@ def objective(trial, X, y, config):
         "reg_lambda": trial.suggest_float("reg_lambda", 1e-8, 10.0, log=True),
         "max_bin": 200,
         "bagging_freq": trial.suggest_int("bagging_freq", 1, 7),
+        "device": "gpu",  # Use GPU
     }
 
     # Cross-validation with the specified stratified K-fold
