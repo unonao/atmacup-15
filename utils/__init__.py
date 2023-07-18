@@ -41,7 +41,7 @@ def normalize_data(X_train_all, X_test, log=False):
     combined_df_filled = combined_df.fillna(combined_df.mean())
 
     if log:
-        combined_df_filled = np.log(combined_df_filled)
+        combined_df_filled = np.log1p(combined_df_filled)
 
     # 正規化
     scaler = StandardScaler()
@@ -54,9 +54,9 @@ def normalize_data(X_train_all, X_test, log=False):
     return X_train_processed, X_test_processed
 
 
-def load_datasets_for_nn(feats):
+def load_datasets_for_nn(feats, log=False):
     X_train, X_test = load_datasets(feats)  # 正規化込み
-    X_train, X_test = normalize_data(X_train, X_test)
+    X_train, X_test = normalize_data(X_train, X_test, log)
 
     dfs = [pd.read_feather(f"../features/{f}_train.feather") for f in feats.norm]
     for model_name in feats.models:
