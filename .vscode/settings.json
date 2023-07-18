@@ -13,6 +13,9 @@
     "black-formatter.args": [
         "--line-length=119"
     ],
+    "python.linting.flake8Args": [
+        "--max-line-length=119"
+    ],
     "python.formatting.provider": "none",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {

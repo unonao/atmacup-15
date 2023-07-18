@@ -4,7 +4,7 @@ import sys
 import uuid
 from pathlib import Path
 import shutil
-
+import math
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import os
@@ -86,7 +86,10 @@ def main(config: DictConfig) -> None:
     unseen_score = evaluate_score(train_df["score"], unseen_train_df, "rmse")
     print(f"seen_score: {seen_score}")
     print(f"unseen_score: {unseen_score}")
-    print(f"predicted score: {seen_score*rate_dict['seen_rate'] + unseen_score*rate_dict['unseen_rate']}")
+    print(f"predicted score: {rate_dict['seen_rate']*seen_score + rate_dict['unseen_rate']*unseen_score}")
+    print(
+        f"predicted score2: {math.sqrt(rate_dict['seen_rate']*seen_score**2 + rate_dict['unseen_rate']*unseen_score**2)}"
+    )
 
     # submissionを作る
     sub = load_sample_sub()

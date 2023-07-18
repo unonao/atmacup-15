@@ -1,5 +1,6 @@
 seen:
-  - 100_lgb/931bf0f0
+  - 100_lgb/931bf0f0 # 1.129 lgb
+  - 000_baseline/8d9ed97c # 1.156 LightGCN
 
 unseen:
   - 201_stratify/a0afcee0 # 1.377
