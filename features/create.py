@@ -400,6 +400,92 @@ class DurationEpisodes(Feature):
         self.test = df[train.shape[0] :]
 
 
+import implicit
+from scipy.sparse import csr_matrix
+
+
+class ImplicitFactors(Feature):
+    def create_features(self):
+        """ """
+        df = features[["user_id", "anime_id"]].copy()
+        # userとitemのIDをマッピング
+        user_id_mapping = {id: i for i, id in enumerate(df["user_id"].unique())}
+        anime_id_mapping = {id: i for i, id in enumerate(df["anime_id"].unique())}
+        df["user_label"] = df["user_id"].map(user_id_mapping)
+        df["anime_label"] = df["anime_id"].map(anime_id_mapping)
+
+        item_user_data = csr_matrix((np.ones(len(df)), (df["user_label"], df["anime_label"])))
+
+        model = implicit.gpu.als.AlternatingLeastSquares(factors=64)  # gpuを想定
+        model.fit(item_user_data)
+
+        user_factors = model.user_factors
+        item_factors = model.item_factors
+        embeddings = np.concatenate(
+            (user_factors[df["user_label"]].to_numpy(), item_factors[df["anime_label"]].to_numpy()), axis=1
+        )
+        embeddings_df = pd.DataFrame(embeddings)
+        embeddings_df.columns = [f"user_factor_{i}" for i in range(user_factors.shape[1])] + [
+            f"item_factor_{j}" for j in range(item_factors.shape[1])
+        ]
+        self.train = embeddings_df[: train.shape[0]]
+        self.test = embeddings_df[train.shape[0] :]
+
+
+class ImplicitFactorsLogisticMatrixFactor(Feature):
+    def create_features(self):
+        """ """
+        df = features[["user_id", "anime_id"]].copy()
+        # userとitemのIDをマッピング
+        user_id_mapping = {id: i for i, id in enumerate(df["user_id"].unique())}
+        anime_id_mapping = {id: i for i, id in enumerate(df["anime_id"].unique())}
+        df["user_label"] = df["user_id"].map(user_id_mapping)
+        df["anime_label"] = df["anime_id"].map(anime_id_mapping)
+
+        item_user_data = csr_matrix((np.ones(len(df)), (df["user_label"], df["anime_label"])))
+
+        model = implicit.cpu.lmf.LogisticMatrixFactorization(factors=30)
+        model.fit(item_user_data)
+
+        user_factors = model.user_factors
+        item_factors = model.item_factors
+        embeddings = np.concatenate((user_factors[df["user_label"]], item_factors[df["anime_label"]]), axis=1)
+        embeddings_df = pd.DataFrame(embeddings)
+        embeddings_df.columns = [f"matrix_user_factor_{i}" for i in range(user_factors.shape[1])] + [
+            f"matrix_item_factor_{j}" for j in range(item_factors.shape[1])
+        ]
+        self.train = embeddings_df[: train.shape[0]]
+        self.test = embeddings_df[train.shape[0] :]
+
+
+class ImplicitFactorsBpr(Feature):
+    def create_features(self):
+        """ """
+        df = features[["user_id", "anime_id"]].copy()
+        # userとitemのIDをマッピング
+        user_id_mapping = {id: i for i, id in enumerate(df["user_id"].unique())}
+        anime_id_mapping = {id: i for i, id in enumerate(df["anime_id"].unique())}
+        df["user_label"] = df["user_id"].map(user_id_mapping)
+        df["anime_label"] = df["anime_id"].map(anime_id_mapping)
+
+        item_user_data = csr_matrix((np.ones(len(df)), (df["user_label"], df["anime_label"])))
+
+        model = implicit.gpu.bpr.BayesianPersonalizedRanking(factors=64)  # gpuを想定
+        model.fit(item_user_data)
+
+        user_factors = model.user_factors
+        item_factors = model.item_factors
+        embeddings = np.concatenate(
+            (user_factors[df["user_label"]].to_numpy(), item_factors[df["anime_label"]].to_numpy()), axis=1
+        )
+        embeddings_df = pd.DataFrame(embeddings)
+        embeddings_df.columns = [f"bpr_user_factor_{i}" for i in range(user_factors.shape[1])] + [
+            f"bpritem_factor_{j}" for j in range(item_factors.shape[1])
+        ]
+        self.train = embeddings_df[: train.shape[0]]
+        self.test = embeddings_df[train.shape[0] :]
+
+
 import sys
 
 sys.path.append(os.pardir)
