@@ -68,6 +68,29 @@ from rapidfuzz.process import cdist
 from rapidfuzz.fuzz import partial_ratio
 
 
+class TextEmbedding(Feature):
+    def create_features(self):
+        """
+        言語モデルによる埋込情報と、同一user_id内でのコサイン類似度の統計量を算出する
+        """
+        # 文字列として扱う列を結合し、元の列を落とす
+        concat_feature = ["japanese_name", "genres", "producers", "licensors", "studios", "rating"]
+        anime_df = anime[concat_feature].copy()
+        # スペース区切りで結合する
+        anime_df[concat_feature] = anime_df[concat_feature].astype(str)
+        anime_df["combined_features"] = anime_df[concat_feature].agg(" ".join, axis=1)
+        embedder = TextEmbedder()
+        anime_embeddings = embedder.get_embeddings(anime_df["combined_features"].values.tolist())
+
+        df = features[["anime_id"]].copy()
+        # anime の何行目にあるのかを求める
+        df["row_number"] = df["anime_id"].map(anime[["anime_id"]].copy().reset_index().set_index("anime_id")["index"])
+        embeddings = anime_embeddings[df["row_number"]]
+        embeddings_df = pd.DataFrame(embeddings, columns=[f"embedding_{i}" for i in range(embeddings.shape[1])])
+        self.train = embeddings_df[: train.shape[0]]
+        self.test = embeddings_df[train.shape[0] :]
+
+
 def calculate_csim(df, aggway="sum", scorer="prefix"):
     """
     文字列の類似度を測る。transformで使うために用いる
@@ -99,29 +122,6 @@ def calculate_csim(df, aggway="sum", scorer="prefix"):
     elif aggway == "max":
         result = np.max(result, axis=1)
     return result
-
-
-class TextEmbedding(Feature):
-    def create_features(self):
-        """
-        言語モデルによる埋込情報と、同一user_id内でのコサイン類似度の統計量を算出する
-        """
-        # 文字列として扱う列を結合し、元の列を落とす
-        concat_feature = ["japanese_name", "genres", "producers", "licensors", "studios", "rating"]
-        anime_df = anime[concat_feature].copy()
-        # スペース区切りで結合する
-        anime_df[concat_feature] = anime_df[concat_feature].astype(str)
-        anime_df["combined_features"] = anime_df[concat_feature].agg(" ".join, axis=1)
-        embedder = TextEmbedder()
-        anime_embeddings = embedder.get_embeddings(anime_df["combined_features"].values.tolist())
-
-        df = features[["anime_id"]].copy()
-        # anime の何行目にあるのかを求める
-        df["row_number"] = df["anime_id"].map(anime[["anime_id"]].copy().reset_index().set_index("anime_id")["index"])
-        embeddings = anime_embeddings[df["row_number"]]
-        embeddings_df = pd.DataFrame(embeddings, columns=[f"embedding_{i}" for i in range(embeddings.shape[1])])
-        self.train = embeddings_df[: train.shape[0]]
-        self.test = embeddings_df[train.shape[0] :]
 
 
 class JapaneseName(Feature):
@@ -227,6 +227,7 @@ class MultiHotFeatures(Feature):
         df = df.drop(["anime_id"], axis=1)
 
         df = cal_user_grouped_stats(df, ["sum", "mean", "var", "min", "max"]).copy()
+        df = df.fillna(df.mean(axis=0))
 
         self.train = df[: train.shape[0]]
         self.test = df[train.shape[0] :]

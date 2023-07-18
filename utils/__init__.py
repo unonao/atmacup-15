@@ -33,12 +33,15 @@ def load_datasets(feats):
 from sklearn.preprocessing import StandardScaler
 
 
-def normalize_data(X_train_all, X_test):
+def normalize_data(X_train_all, X_test, log=False):
     # データ結合
     combined_df = pd.concat([X_train_all, X_test], axis=0)
 
     # 欠損値の平均値で埋める
     combined_df_filled = combined_df.fillna(combined_df.mean())
+
+    if log:
+        combined_df_filled = np.log(combined_df_filled)
 
     # 正規化
     scaler = StandardScaler()
