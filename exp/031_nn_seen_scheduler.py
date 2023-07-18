@@ -152,7 +152,7 @@ def main(config: DictConfig) -> None:
         criterion = nn.MSELoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=config.nn.lr, weight_decay=config.nn.weight_decay)
         lr_sched = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-            optimizer, T_0=5, T_mult=2, eta_min=config.nn.lr * 0.1
+            optimizer, T_0=10, T_mult=2, eta_min=config.nn.lr * 0.1
         )
 
         best_val_loss = float("inf")
@@ -191,7 +191,7 @@ def main(config: DictConfig) -> None:
 
             train_loss /= len(train_loader)
             valid_loss /= len(valid_loader)
-            print(f"Epoch{epoch}: Training Loss{train_loss},  Validation Loss {valid_loss}")
+            print(f"Epoch{epoch}: Training Loss {train_loss},  Validation Loss {valid_loss}")
             wandb.log(
                 {"epoch": epoch, f"nn/train_loss/fold-{fold}": train_loss, f"nn/valid_loss/fold-{fold}": valid_loss}
             )

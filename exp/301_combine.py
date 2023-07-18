@@ -31,7 +31,7 @@ def grid_search_weights(dfs, y_true):
     best_weights = None
 
     # 0.0から1.0まで0.1刻みで重みを試す
-    for weights in product(np.arange(0.0, 1.1, 0.1), repeat=len(dfs)):
+    for weights in product(np.arange(0.0, 1.1, 0.05), repeat=len(dfs)):
         if sum(weights) != 1.0:  # 重みの合計が1になる組み合わせだけ試す
             continue
         weighted_pred = cal_weighted_pred(dfs, weights)

@@ -191,7 +191,7 @@ def main(config: DictConfig) -> None:
 
             train_loss /= len(train_loader)
             valid_loss /= len(valid_loader)
-            print(f"Epoch{epoch}: Training Loss{train_loss},  Validation Loss {valid_loss}")
+            print(f"Epoch{epoch}: Training Loss {train_loss},  Validation Loss {valid_loss}")
             wandb.log(
                 {"epoch": epoch, f"nn/train_loss/fold-{fold}": train_loss, f"nn/valid_loss/fold-{fold}": valid_loss}
             )
