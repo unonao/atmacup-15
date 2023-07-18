@@ -91,6 +91,54 @@ class TextEmbedding(Feature):
         self.test = embeddings_df[train.shape[0] :]
 
 
+import cupy as cp
+from cuml.metrics import pairwise_distances
+
+
+class TextCosineSim(Feature):
+    def create_features(self):
+        """
+        言語モデルによる埋込情報と、同一user_id内でのコサイン類似度の統計量を算出する
+        """
+        # 文字列として扱う列を結合し、元の列を落とす
+        concat_feature = ["japanese_name", "genres", "producers", "licensors", "studios", "rating"]
+        anime_df = anime[concat_feature].copy()
+        # スペース区切りで結合する
+        anime_df[concat_feature] = anime_df[concat_feature].astype(str)
+        anime_df["combined_features"] = anime_df[concat_feature].agg(" ".join, axis=1)
+        embedder = TextEmbedder()
+        anime_embeddings = embedder.get_embeddings(anime_df["combined_features"].values.tolist())
+        df = features[["user_id", "anime_id"]].copy()
+        df["row_number"] = df["anime_id"].map(anime[["anime_id"]].copy().reset_index().set_index("anime_id")["index"])
+        embeddings_cp = cp.array(anime_embeddings)
+        cosine_sim_matrix = pairwise_distances(embeddings_cp, embeddings_cp, metric="cosine")
+        cosine_sim_matrix = cp.asnumpy(cosine_sim_matrix)
+        cosine_sim_df = pd.DataFrame(cosine_sim_matrix)
+
+        def calculate_cosine_sim(row_numbers, aggway="sum"):
+            result = cosine_sim_df.iloc[row_numbers.to_numpy(), row_numbers.to_numpy()].to_numpy()
+            np.fill_diagonal(result, 0.0)
+            if aggway == "sum":
+                result = np.sum(result, axis=1)
+            elif aggway == "mean":
+                result = np.mean(result, axis=1)
+            elif aggway == "var":
+                result = np.var(result, axis=1)
+            elif aggway == "max":
+                result = np.max(result, axis=1)
+            return result
+
+        use_cols = []
+        for aggway in ["sum", "mean", "var", "max"]:
+            col = f"cosine_sim_{aggway}"
+            use_cols.append(col)
+            print(col)
+            df[col] = df.groupby("user_id")["row_number"].transform(calculate_cosine_sim, aggway)
+        df = df[use_cols]
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
 def calculate_csim(df, aggway="sum", scorer="prefix"):
     """
     文字列の類似度を測る。transformで使うために用いる
