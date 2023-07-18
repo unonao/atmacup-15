@@ -225,6 +225,31 @@ class CategoricalLabelEncoded(Feature):
         self.test = df[train.shape[0] :]
 
 
+from sklearn.preprocessing import OneHotEncoder
+
+
+class CategoricalOneHotEncoded(Feature):
+    def create_features(self):
+        """
+        categorical_features をOne-hotエンコードした特徴量
+        """
+        transformed_df = pd.DataFrame()
+
+        for column in categorical_features:
+            df = features[column].copy().to_frame()
+            df = df.fillna("NA")  # Fill missing values
+            ohe = OneHotEncoder(sparse_output=False)
+            ohe.fit(df)
+            transformed_column = ohe.transform(df)
+            transformed_column = pd.DataFrame(transformed_column, columns=ohe.get_feature_names_out(df.columns))
+
+            # Merge the transformed column with the overall DataFrame
+            transformed_df = pd.concat([transformed_df, transformed_column], axis=1)
+
+        self.train = transformed_df[: train.shape[0]]
+        self.test = transformed_df[train.shape[0] :]
+
+
 class CategoricalLabelEncodedWithUser(Feature):
     def create_features(self):
         """
@@ -240,6 +265,28 @@ class CategoricalLabelEncodedWithUser(Feature):
             les.append(le)
         self.train = df[: train.shape[0]]
         self.test = df[train.shape[0] :]
+
+
+class CategoricalOneHotEncodedWithUser(Feature):
+    def create_features(self):
+        """
+        categorical_features をOne-hotエンコードした特徴量
+        """
+        transformed_df = pd.DataFrame()
+        use_features = categorical_features + ["user_id"]
+        for column in use_features:
+            df = features[column].copy().to_frame()
+            df = df.fillna("NA")  # Fill missing values
+            ohe = OneHotEncoder(sparse_output=False)
+            ohe.fit(df)
+            transformed_column = ohe.transform(df)
+            transformed_column = pd.DataFrame(transformed_column, columns=ohe.get_feature_names_out(df.columns))
+
+            # Merge the transformed column with the overall DataFrame
+            transformed_df = pd.concat([transformed_df, transformed_column], axis=1)
+
+        self.train = transformed_df[: train.shape[0]]
+        self.test = transformed_df[train.shape[0] :]
 
 
 class UserNum(Feature):
