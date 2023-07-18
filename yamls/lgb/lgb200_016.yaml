@@ -1,4 +1,4 @@
-id: lgb200_011
+id: lgb200_016
 
 feats:
   num:
@@ -10,12 +10,16 @@ feats:
     - other_string
     - string_len
     - implicit_factors
+    - implicit_factors_logistic_matrix_factor
+    - implicit_factors_bpr
+    - multi_hot_features
   cat:
     - categorical_label_encoded # categorical_label_encoded_with_user
   models:  # 学習済みモデルの結果を使う
     - 020_surprise_unseen/d97af2c0 # 1.441 KNNBaseline
     - 020_surprise_unseen/5e4526f8 # 1.442 SVD
     - 020_surprise_unseen/4ed7afa2 # 1.441
+    - 040_nn_unseen/1d5e8956 # 1.3993705530632756 NN
 
 target_name: score
 num_folds : 5

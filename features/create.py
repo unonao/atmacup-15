@@ -529,6 +529,44 @@ class ImplicitFactorsBpr(Feature):
         self.test = embeddings_df[train.shape[0] :]
 
 
+class ImplicitFactorsBprSvd(Feature):
+    def create_features(self):
+        """ """
+        df = features[["user_id", "anime_id"]].copy()
+        # userとitemのIDをマッピング
+        user_id_mapping = {id: i for i, id in enumerate(df["user_id"].unique())}
+        anime_id_mapping = {id: i for i, id in enumerate(df["anime_id"].unique())}
+        df["user_label"] = df["user_id"].map(user_id_mapping)
+        df["anime_label"] = df["anime_id"].map(anime_id_mapping)
+
+        item_user_data = csr_matrix((np.ones(len(df)), (df["user_label"], df["anime_label"])))
+
+        model = implicit.gpu.bpr.BayesianPersonalizedRanking(factors=64)  # gpuを想定
+        model.fit(item_user_data)
+
+        user_factors = model.user_factors
+        item_factors = model.item_factors
+        embeddings = np.concatenate(
+            (user_factors[df["user_label"]].to_numpy(), item_factors[df["anime_label"]].to_numpy()), axis=1
+        )
+        embeddings_df = pd.DataFrame(embeddings)
+        embeddings_df.columns = [f"bpr_user_factor_{i}" for i in range(user_factors.shape[1])] + [
+            f"bpr_item_factor_{j}" for j in range(item_factors.shape[1])
+        ]
+
+        # ユニーク数が多いので、SVDで次元圧縮する
+        n_components = 10
+        svd = cuml.TruncatedSVD(n_components=n_components)
+        svd.fit(item_factors.to_numpy())
+        svd_arr = svd.transform(item_factors[df["anime_label"]].to_numpy())
+        svd_df = pd.DataFrame(svd_arr, columns=[f"bpr_svd_{ix}" for ix in range(n_components)])
+
+        svd_df = cal_user_grouped_stats(svd_df, ["sum", "mean", "var", "min", "max"]).copy()
+
+        self.train = svd_df[: train.shape[0]]
+        self.test = svd_df[train.shape[0] :]
+
+
 class PcaTwenty(Feature):
     def create_features(self):
         """ """
