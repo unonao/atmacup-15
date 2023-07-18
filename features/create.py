@@ -686,6 +686,35 @@ class ImplicitFactorsBprSvd(Feature):
         self.test = svd_df[train.shape[0] :]
 
 
+class ImplicitFactorsUser(Feature):
+    def create_features(self):
+        """ """
+        df = features[["user_id", "anime_id"]].copy()
+        # userとitemのIDをマッピング
+        user_id_mapping = {id: i for i, id in enumerate(df["user_id"].unique())}
+        anime_id_mapping = {id: i for i, id in enumerate(df["anime_id"].unique())}
+        df["user_label"] = df["user_id"].map(user_id_mapping)
+        df["anime_label"] = df["anime_id"].map(anime_id_mapping)
+
+        item_user_data = csr_matrix((np.ones(len(df)), (df["user_label"], df["anime_label"])))
+
+        embeddings_df_list = []
+        for key, model in {
+            "mf": implicit.cpu.lmf.LogisticMatrixFactorization(factors=30),
+            "bpr": implicit.cpu.bpr.BayesianPersonalizedRanking(factors=64),
+            "als": implicit.cpu.als.AlternatingLeastSquares(factors=64),
+        }.items():
+            model.fit(item_user_data)
+            factor = model.user_factors
+            embeddings_df = pd.DataFrame(
+                factor[df["user_label"]], columns=[f"{key}_user_{i}" for i in range(factor.shape[1])]
+            )
+            embeddings_df_list.append(embeddings_df)
+        embeddings_df = pd.concat(embeddings_df_list, axis=1)
+        self.train = embeddings_df[: train.shape[0]]
+        self.test = embeddings_df[train.shape[0] :]
+
+
 class PcaTwenty(Feature):
     def create_features(self):
         """ """
