@@ -1,6 +1,7 @@
 import os
 import re as re
 from pathlib import Path
+import sys
 
 import numpy as np
 import pandas as pd
@@ -8,6 +9,19 @@ from base import Feature, generate_features, get_arguments
 from hydra import compose, initialize
 from omegaconf import DictConfig, OmegaConf
 from sklearn.preprocessing import LabelEncoder
+
+from sklearn.decomposition import TruncatedSVD
+from sklearn.preprocessing import MultiLabelBinarizer
+
+
+import implicit
+from scipy.sparse import csr_matrix
+
+import cuml
+
+sys.path.append(os.pardir)
+from utils import load_datasets
+
 
 Feature.dir = "."
 label_feature = "score"
@@ -24,7 +38,7 @@ features = None
 agg_func_list = ["count", "sum", "mean", "var", "min", "max"]
 
 
-def cal_user_grouped_stats(df) -> pd.DataFrame:
+def cal_user_grouped_stats(df, agg_list=agg_func_list) -> pd.DataFrame:
     """
     数値カラムからなるdfを受け取って、user_idでgroupした統計量を求め、元の特徴量との関係を作る
     - 元のカラム
@@ -36,7 +50,7 @@ def cal_user_grouped_stats(df) -> pd.DataFrame:
     _df["user_id"] = features["user_id"]
 
     # 集約
-    user_stats = _df.groupby("user_id").agg(agg_func_list)
+    user_stats = _df.groupby("user_id").agg(agg_list)
     user_stats.columns = ["_".join(col).strip() for col in user_stats.columns.values]
     user_stats.reset_index(inplace=True)
     _df = pd.merge(_df, user_stats, on="user_id", how="left").copy()
@@ -157,6 +171,39 @@ class StringLen(Feature):
         df = df[use_cols]
 
         df = cal_user_grouped_stats(df)
+
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
+class MultiHotFeatures(Feature):
+    def create_features(self):
+        df = features[["anime_id"]].copy()
+        multilabel_cols = ["genres", "producers", "licensors", "studios"]
+        multilabel_dfs = []
+
+        all_cols = []
+        for c in multilabel_cols:
+            list_srs = anime[c].map(lambda x: x.split(",")).tolist()
+            mlb = MultiLabelBinarizer()
+            ohe_srs = mlb.fit_transform(list_srs)
+            col_names = [f"ohe_{c}_{name}" for name in mlb.classes_]
+            col_df = pd.DataFrame(ohe_srs, columns=col_names)
+            all_cols += col_names
+            multilabel_dfs.append(col_df)
+
+        multilabel_df = pd.concat(multilabel_dfs, axis=1)
+
+        # ユニーク数が多いので、SVDで次元圧縮する
+        n_components = 30
+        svd = cuml.TruncatedSVD(n_components=n_components)
+        svd_df = svd.fit_transform(multilabel_df.astype(float))
+        svd_df.columns = [f"svd_{ix}" for ix in range(n_components)]
+        svd_df["anime_id"] = anime["anime_id"]
+        df = df.merge(svd_df, on="anime_id", how="left")
+        df = df.drop(["anime_id"], axis=1)
+
+        df = cal_user_grouped_stats(df, ["sum", "mean", "var", "min", "max"]).copy()
 
         self.train = df[: train.shape[0]]
         self.test = df[train.shape[0] :]
@@ -400,10 +447,6 @@ class DurationEpisodes(Feature):
         self.test = df[train.shape[0] :]
 
 
-import implicit
-from scipy.sparse import csr_matrix
-
-
 class ImplicitFactors(Feature):
     def create_features(self):
         """ """
@@ -480,17 +523,10 @@ class ImplicitFactorsBpr(Feature):
         )
         embeddings_df = pd.DataFrame(embeddings)
         embeddings_df.columns = [f"bpr_user_factor_{i}" for i in range(user_factors.shape[1])] + [
-            f"bpritem_factor_{j}" for j in range(item_factors.shape[1])
+            f"bpr_item_factor_{j}" for j in range(item_factors.shape[1])
         ]
         self.train = embeddings_df[: train.shape[0]]
         self.test = embeddings_df[train.shape[0] :]
-
-
-import sys
-
-sys.path.append(os.pardir)
-from utils import load_datasets
-import cuml
 
 
 class PcaTwenty(Feature):
