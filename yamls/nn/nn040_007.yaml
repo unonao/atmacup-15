@@ -1,5 +1,5 @@
 
-id: nn040_004
+id: nn040_007
 feats:
   num:
     - duration_episodes #duration
@@ -14,10 +14,7 @@ feats:
     - implicit_factors_bpr
     - multi_hot_features
   cat: []
-  models:  # 学習済みモデルの結果を使う
-    - 020_surprise_unseen/d97af2c0 # 1.441 KNNBaseline
-    - 020_surprise_unseen/5e4526f8 # 1.442 SVD
-    - 020_surprise_unseen/4ed7afa2 # 1.441
+  models:  []
 
 
 num_epochs: 50

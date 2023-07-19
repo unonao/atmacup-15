@@ -1,5 +1,5 @@
 
-id: nn040_004
+id: nn040_008
 feats:
   num:
     - duration_episodes #duration
@@ -13,6 +13,7 @@ feats:
     - implicit_factors_logistic_matrix_factor
     - implicit_factors_bpr
     - multi_hot_features
+    - lightgcn_embedding
   cat: []
   models:  # 学習済みモデルの結果を使う
     - 020_surprise_unseen/d97af2c0 # 1.441 KNNBaseline
