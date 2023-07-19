@@ -34,12 +34,14 @@ python 005_lightgcn_unseen.py debug=True train=000_lightgcn.yaml
 python 010_surprise.py surprise.name=SVD debug=True
 
 python 031_nn_seen_scheduler.py nn=nn031_006
+python 033_nn.py nn=nn033_002
 python 041_nn_seen_scheduler.py nn=nn040_007
 python 100_lgb.py lgb=lgb100_013
 python 200_lgb.py lgb=lgb200
 python 201_stratify.py lgb=lgb200_017
 python 300_combine.py combine=combine306
 python 301_combine.py combine=combine306
+python 302_combine.py combine=combine310
 
 python 041_nn_unseen_scheduler.py  nn=nn040_007
 
