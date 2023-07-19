@@ -1,11 +1,11 @@
 seen:
   - 100_lgb/a47bfbf2 # 1.10106 lgb
   - 000_baseline/8d9ed97c # 1.156 LightGCN
-  - 031_nn_seen_scheduler/60d2e178 # 1.165 NN
-  - 010_surprise/4b84f9aa # 1.191 SVDpp
+  #- 031_nn_seen_scheduler/60d2e178 # 1.165 NN
+  #- 010_surprise/4b84f9aa # 1.191 SVDpp
 
 unseen:
-  - 201_stratify/60a0003e # 1.36621
+  - 201_stratify/b97bce2a # 1.36621
   - 041_nn_unseen_scheduler/81fb0f42 # 1.384 NN
-  - 020_surprise_unseen/4ed7afa2 # 1.441 BaselineOnly
+  #- 020_surprise_unseen/4ed7afa2 # 1.441 BaselineOnly
 

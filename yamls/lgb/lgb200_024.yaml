@@ -1,0 +1,43 @@
+
+id: lgb200_024
+
+feats:
+  num:
+    - duration_episodes #duration
+    - genres
+    - user_num
+    - aired
+    - japanese_name
+    - other_string
+    - string_len
+    - implicit_factors
+    - implicit_factors_logistic_matrix_factor
+    - implicit_factors_bpr
+    - multi_hot_features
+    - lightgcn_embedding
+    - svd_lightgcn_embedding
+    - implicit_factors_bpr_agg
+  cat:
+    - categorical_label_encoded # categorical_label_encoded_with_user
+  models: [] # 学習済みモデルの結果を使う
+
+target_name: score
+num_folds : 5
+
+params: 
+  objective: regression
+  metric: rmse
+  verbosity: -1
+  boosting_type: gbdt
+  learning_rate: 0.02
+  num_leaves: 64
+  min_child_samples: 160
+  max_depth: -1
+  subsample_freq: 0
+  bagging_seed: 0
+  feature_fraction: 0.9
+  bagging_fraction: 0.8
+  reg_alpha: 0.1
+  reg_lambda: 0.1
+  max_bin: 200
+  device: gpu  # Use GPU
