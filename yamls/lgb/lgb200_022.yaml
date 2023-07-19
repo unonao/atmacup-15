@@ -1,5 +1,5 @@
 
-id: lgb200_021
+id: lgb200_022
 
 feats:
   num:
@@ -14,7 +14,8 @@ feats:
     - implicit_factors_logistic_matrix_factor
     - implicit_factors_bpr
     - multi_hot_features
-    - bpr_lightgcn_embedding
+    - lightgcn_embedding
+    - svd_lightgcn_embedding
   cat:
     - categorical_label_encoded # categorical_label_encoded_with_user
   models: [] # 学習済みモデルの結果を使う

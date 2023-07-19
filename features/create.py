@@ -830,6 +830,69 @@ class BprLightgcnEmbedding(Feature):
         self.test = embeddings_df[train.shape[0] :]
 
 
+class SvdLightgcnEmbedding(Feature):
+    def create_features(self):
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        all_df = features[["user_id", "anime_id"]].copy()
+        all_df["user_label"], user_idx = pd.factorize(all_df["user_id"])
+        all_df["anime_label"], anime_idx = pd.factorize(all_df["anime_id"])
+        all_df["is_train"] = True
+        all_df.loc[len(train) :, "is_train"] = False
+        # userとanimeの番号が別になるようにずらす
+        all_df["anime_label"] += len(user_idx)
+        num_nodes = len(user_idx) + len(anime_idx)
+        edges = all_df[["user_label", "anime_label"]].to_numpy()
+        edge_index = torch.tensor(edges.T, dtype=torch.long).contiguous()
+        data = Data(num_nodes=num_nodes, edge_index=edge_index).to(device)
+        data.edge_weight = torch.ones(len(all_df)).contiguous().to(device)
+
+        # Negative Edge を追加
+        transform = RandomLinkSplit(num_val=0, num_test=0, add_negative_train_samples=True, neg_sampling_ratio=1.0)
+        train_data, _, _ = transform(data)
+
+        model = LightGCN(
+            num_nodes=data.num_nodes,
+            embedding_dim=256,
+            num_layers=4,
+        ).to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+        for epoch in tqdm(range(2001)):
+            pred = model.predict_link(
+                train_data.edge_index, train_data.edge_label_index, edge_weight=train_data.edge_weight, prob=True
+            )
+            loss = model.link_pred_loss(pred, train_data["edge_label"])
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            if epoch % 10 == 0:
+                tqdm.write(f"epoch {epoch} : loss {loss.item()}")
+
+        # 埋め込み取得
+        vectors = model.get_embedding(data.edge_index).detach().cpu().numpy()
+        vectors /= np.linalg.norm(vectors)  # normalized
+        user_factors = vectors[: len(user_idx)]
+        item_factors = vectors[len(user_idx) :]
+        embeddings = np.concatenate(
+            (user_factors[all_df["user_label"]], item_factors[(all_df["anime_label"] - len(user_idx))]), axis=1
+        )
+        embeddings_df = pd.DataFrame(embeddings)
+        embeddings_df.columns = [f"lightgcn_user_factor_{i}" for i in range(user_factors.shape[1])] + [
+            f"lightgcn_item_factor_{j}" for j in range(item_factors.shape[1])
+        ]
+
+        # ユニーク数が多いので、SVDで次元圧縮する
+        n_components = 30
+        svd = cuml.TruncatedSVD(n_components=n_components)
+        svd.fit(embeddings)
+        svd_arr = svd.transform(embeddings)
+        svd_df = pd.DataFrame(svd_arr, columns=[f"bpr_lightgcn_{ix}" for ix in range(n_components)])
+
+        self.train = svd_df[: train.shape[0]]
+        self.test = svd_df[train.shape[0] :]
+
+
 class PcaTwenty(Feature):
     def create_features(self):
         """ """
