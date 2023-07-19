@@ -19,7 +19,6 @@ from torch_geometric.data import Data
 from torch_geometric.transforms import RandomLinkSplit
 from tqdm.auto import tqdm
 
-
 sys.path.append(os.pardir)
 from utils import load_datasets
 from utils.embedding import TextEmbedder
@@ -66,8 +65,8 @@ def cal_user_grouped_stats(df, agg_list=agg_func_list) -> pd.DataFrame:
 
 
 from rapidfuzz.distance import DamerauLevenshtein, Postfix, Prefix
-from rapidfuzz.process import cdist
 from rapidfuzz.fuzz import partial_ratio
+from rapidfuzz.process import cdist
 
 
 class TextEmbedding(Feature):
