@@ -33,8 +33,9 @@ python 005_lightgcn_unseen.py debug=True train=000_lightgcn.yaml
 python 031_nn_seen_scheduler.py nn=nn031_006
 python 100_lgb.py lgb=lgb100_013
 python 200_lgb.py lgb=lgb200
-python 201_stratify.py lgb=lgb200_012
-python 300_combine.py lgb=combine300
+python 201_stratify.py lgb=lgb200_017
+python 300_combine.py combine=combine306
+python 301_combine.py combine=combine306
 
 python 010_surprise.py surprise.name=SVD debug=True
 """

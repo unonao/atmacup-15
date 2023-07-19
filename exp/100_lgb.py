@@ -71,7 +71,7 @@ def main(config: DictConfig) -> None:
         model_lgb = lgb.train(
             OmegaConf.to_container(config.lgb.params),
             lgb_train,
-            num_boost_round=1000 if config.debug is False else 100,
+            num_boost_round=5000 if config.debug is False else 100,
             valid_sets=[lgb_train, lgb_val],
             callbacks=callbacks,
         )
