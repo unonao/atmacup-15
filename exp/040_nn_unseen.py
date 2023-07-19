@@ -170,8 +170,7 @@ def main(config: DictConfig) -> None:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-                train_loss += loss.item()
-                wandb.log({"epoch": epoch, f"nn/train_loss/fold-{fold}": loss.item()})
+                train_loss += loss.item() ** 2
 
             # Validate the model
             model.eval()
@@ -182,13 +181,14 @@ def main(config: DictConfig) -> None:
                     targets = targets.float().to(device)
                     outputs = model(inputs)
                     loss = torch.sqrt(criterion(outputs.squeeze(), targets))
-                    valid_loss += loss.item()
+                    valid_loss += loss.item() ** 2
 
-                    wandb.log({"epoch": epoch, f"nn/valid_loss/fold-{fold}": loss.item()})
-
-            train_loss /= len(train_loader)
-            valid_loss /= len(valid_loader)
-            print(f"Epoch{epoch}: Training Loss{train_loss},  Validation Loss {valid_loss}")
+            train_loss = np.sqrt(train_loss / len(train_loader))
+            valid_loss = np.sqrt(valid_loss / len(valid_loader))
+            print(f"Epoch{epoch}: Training Loss {train_loss},  Validation Loss {valid_loss}")
+            wandb.log(
+                {"epoch": epoch, f"nn/train_loss/fold-{fold}": train_loss, f"nn/valid_loss/fold-{fold}": valid_loss}
+            )
             # Save the model if it has the best score so far
             if valid_loss < best_val_loss:
                 torch.save(model.state_dict(), f"{output_path}/best_model.pt")

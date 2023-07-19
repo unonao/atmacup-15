@@ -30,6 +30,7 @@ def seed_everything(seed=1234):
 
 
 def objective(trial, X, y, config):
+    seed_everything()
     # LightGBM parameters
     lgb_params = {
         "objective": "regression",

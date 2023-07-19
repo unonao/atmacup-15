@@ -95,6 +95,7 @@ def prepare_data(X_train_all, X_test):
 
 
 def objective(trial, config: DictConfig, X_train_all, X_test, y_train_all, train_user_ids):
+    seed_everything()
     # ハイパーパラメータのサジェスチョン
     n_layers = trial.suggest_int("n_layers", 2, 5)
     hidden_dim = trial.suggest_int("hidden_dim", 64, 4096, log=True)
@@ -143,13 +144,13 @@ def objective(trial, config: DictConfig, X_train_all, X_test, y_train_all, train
 
                 # Forward pass
                 outputs = model(inputs)
-                loss = criterion(outputs.squeeze(), targets)
+                loss = torch.sqrt(criterion(outputs.squeeze(), targets))
 
                 # Backward pass and optimize
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-                train_loss += loss.item()
+                train_loss += loss.item() ** 2
             lr_sched.step()
 
             # Validate the model
@@ -160,8 +161,8 @@ def objective(trial, config: DictConfig, X_train_all, X_test, y_train_all, train
                     inputs = inputs.float().to(device)
                     targets = targets.float().to(device)
                     outputs = model(inputs)
-                    loss = criterion(outputs.squeeze(), targets)
-                    valid_loss += loss.item()
+                    loss = torch.sqrt(criterion(outputs.squeeze(), targets))
+                    valid_loss += loss.item() ** 2
 
             train_loss = np.sqrt(train_loss / len(train_loader))
             valid_loss = np.sqrt(valid_loss / len(valid_loader))
@@ -188,7 +189,6 @@ def objective(trial, config: DictConfig, X_train_all, X_test, y_train_all, train
 # メインの学習ループ
 @hydra.main(version_base=None, config_path="../yamls", config_name="config")
 def main(config: DictConfig) -> None:
-    seed_everything()
     os.makedirs(output_path, exist_ok=True)
 
     X_train_all, X_test = load_datasets(config.nn.feats)
