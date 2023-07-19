@@ -1,27 +1,29 @@
 import os
 import re as re
-from pathlib import Path
 import sys
+from pathlib import Path
 
+import cuml
+import implicit
 import numpy as np
 import pandas as pd
+import torch
+import torch.nn.functional as F
 from base import Feature, generate_features, get_arguments
 from hydra import compose, initialize
 from omegaconf import DictConfig, OmegaConf
-from sklearn.preprocessing import LabelEncoder
-
-from sklearn.decomposition import TruncatedSVD
-from sklearn.preprocessing import MultiLabelBinarizer
-
-
-import implicit
 from scipy.sparse import csr_matrix
+from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
+from torch import Tensor
+from torch_geometric.data import Data
+from torch_geometric.transforms import RandomLinkSplit
+from tqdm.auto import tqdm
 
-import cuml
 
 sys.path.append(os.pardir)
 from utils import load_datasets
 from utils.embedding import TextEmbedder
+from utils.gcn import LightGCN
 
 Feature.dir = "."
 label_feature = "score"
@@ -711,6 +713,62 @@ class ImplicitFactorsUser(Feature):
             )
             embeddings_df_list.append(embeddings_df)
         embeddings_df = pd.concat(embeddings_df_list, axis=1)
+        self.train = embeddings_df[: train.shape[0]]
+        self.test = embeddings_df[train.shape[0] :]
+
+
+class LightgcnEmbedding(Feature):
+    def create_features(self):
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        all_df = features[["user_id", "anime_id"]].copy()
+        all_df["user_label"], user_idx = pd.factorize(all_df["user_id"])
+        all_df["anime_label"], anime_idx = pd.factorize(all_df["anime_id"])
+        all_df["is_train"] = True
+        all_df.loc[len(train) :, "is_train"] = False
+        # userとanimeの番号が別になるようにずらす
+        all_df["anime_label"] += len(user_idx)
+        num_nodes = len(user_idx) + len(anime_idx)
+        edges = all_df[["user_label", "anime_label"]].to_numpy()
+        edge_index = torch.tensor(edges.T, dtype=torch.long).contiguous()
+        data = Data(num_nodes=num_nodes, edge_index=edge_index).to(device)
+        data.edge_weight = torch.ones(len(all_df)).contiguous().to(device)
+
+        # Negative Edge を追加
+        transform = RandomLinkSplit(num_val=0, num_test=0, add_negative_train_samples=True, neg_sampling_ratio=1.0)
+        train_data, _, _ = transform(data)
+
+        model = LightGCN(
+            num_nodes=data.num_nodes,
+            embedding_dim=64,
+            num_layers=3,
+        ).to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+        for epoch in tqdm(range(2001)):
+            # train
+            pred = model.predict_link(
+                train_data.edge_index, train_data.edge_label_index, edge_weight=train_data.edge_weight, prob=True
+            )
+            loss = model.link_pred_loss(pred, train_data["edge_label"])
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            if epoch % 10 == 0:
+                tqdm.write(f"epoch {epoch} : loss {loss.item()}")
+
+        # 埋め込み取得
+        vectors = model.get_embedding(data.edge_index).detach().cpu().numpy()
+        vectors /= np.linalg.norm(vectors)  # normalized
+        user_factors = vectors[: len(user_idx)]
+        item_factors = vectors[len(user_idx) :]
+        embeddings = np.concatenate(
+            (user_factors[all_df["user_label"]], item_factors[(all_df["anime_label"] - len(user_idx))]), axis=1
+        )
+        embeddings_df = pd.DataFrame(embeddings)
+        embeddings_df.columns = [f"lightgcn_user_factor_{i}" for i in range(user_factors.shape[1])] + [
+            f"lightgcn_item_factor_{j}" for j in range(item_factors.shape[1])
+        ]
         self.train = embeddings_df[: train.shape[0]]
         self.test = embeddings_df[train.shape[0] :]
 
