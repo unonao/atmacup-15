@@ -24,11 +24,11 @@ feats:
 
 num_epochs: 50
 early_stopping: 10
-weight_decay: 5.474851030269466e-06
-dropout_rate: 0.45073218696145845
+weight_decay: 0.0008783056531097395
+dropout_rate: 0.4906275199604325
 lr: 0.002
 batch_size: 128
 num_layers: 4
-hidden_dim: 202
+hidden_dim: 106
 target_name: score
 num_folds : 5
