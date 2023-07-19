@@ -1,6 +1,10 @@
+"""
+手元の CV スコアと public LB のスコアを用いて、unseenの割合を求めるスクリプト
+"""
 from scipy.optimize import minimize
 import numpy as np
 
+# seen score,  unseen score,  public の順に格納
 scores = [
     [1.143132400409859, 1.4139537431522253, 1.2218],
     [1.13855, 1.40413, 1.2124],
