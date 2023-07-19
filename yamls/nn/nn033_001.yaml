@@ -1,0 +1,41 @@
+
+id: nn033_001
+feats:
+  num:
+    - duration_episodes #duration
+    - genres
+    - user_num
+    - aired
+    - japanese_name
+    - other_string
+    - string_len
+    - implicit_factors
+    - implicit_factors_logistic_matrix_factor
+    - implicit_factors_bpr
+    - multi_hot_features
+    - lightgcn_embedding
+    
+  cat: []
+  models:  # 学習済みモデルの結果を使う
+    - 010_surprise/4b84f9aa # 1.191 SVDpp
+    - 010_surprise/277704d6 # 1.203 SVD
+    - 010_surprise/bad2980e # 1.202 KNNWithZScore
+    - 010_surprise/51c879fa # 1.209 KNNWithMeans
+    - 010_surprise/f01160fa # 1.319 KNNBasic
+    - 010_surprise/cc507138 # 1.21 BaselineOnly
+    - 010_surprise/7027401c # 1.199 SlopeOne
+    - 010_surprise/bbcd9cce # 1.319 KNNBasic
+    - 010_surprise/ff720d44 # 1.24 CoClustering
+    - 000_baseline/8d9ed97c
+
+
+num_epochs: 50
+early_stopping: 10
+weight_decay: 0.0004287763209553715
+dropout_rate: 0.1412633650753899
+lr: 0.002
+batch_size: 256
+hidden_dim: 199
+num_layers: 2
+target_name: score
+num_folds : 5
