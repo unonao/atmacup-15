@@ -36,7 +36,7 @@ test = None
 anime = None
 features = None
 
-agg_func_list = ["count", "sum", "mean", "var", "min", "max"]
+agg_func_list = ["sum", "mean", "var", "min", "max"]  # "count" を除く
 
 
 def cal_user_grouped_stats(df, agg_list=agg_func_list) -> pd.DataFrame:
@@ -645,6 +645,33 @@ class ImplicitFactorsBpr(Feature):
         embeddings_df.columns = [f"bpr_user_factor_{i}" for i in range(user_factors.shape[1])] + [
             f"bpr_item_factor_{j}" for j in range(item_factors.shape[1])
         ]
+        self.train = embeddings_df[: train.shape[0]]
+        self.test = embeddings_df[train.shape[0] :]
+
+
+class ImplicitFactorsBprAgg(Feature):
+    def create_features(self):
+        """ """
+        df = features[["user_id", "anime_id"]].copy()
+        # userとitemのIDをマッピング
+        user_id_mapping = {id: i for i, id in enumerate(df["user_id"].unique())}
+        anime_id_mapping = {id: i for i, id in enumerate(df["anime_id"].unique())}
+        df["user_label"] = df["user_id"].map(user_id_mapping)
+        df["anime_label"] = df["anime_id"].map(anime_id_mapping)
+
+        item_user_data = csr_matrix((np.ones(len(df)), (df["user_label"], df["anime_label"])))
+
+        model = implicit.gpu.bpr.BayesianPersonalizedRanking(factors=32)  # gpuを想定
+        model.fit(item_user_data)
+
+        user_factors = model.user_factors
+        item_factors = model.item_factors
+        embeddings = item_factors[df["anime_label"]].to_numpy()
+        embeddings_df_columns = [f"bpr_item_factor_{j}" for j in range(item_factors.shape[1])]
+        embeddings_df = pd.DataFrame(embeddings, columns=embeddings_df_columns)
+        embeddings_df = cal_user_grouped_stats(embeddings_df, ["sum", "mean", "var", "min", "max"]).copy()
+        embeddings_df = embeddings_df.drop(embeddings_df_columns, axis=1)
+
         self.train = embeddings_df[: train.shape[0]]
         self.test = embeddings_df[train.shape[0] :]
 
