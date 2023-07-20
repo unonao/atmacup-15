@@ -37,7 +37,7 @@ def objective(trial, X, y, config):
         "metric": "rmse",
         "verbosity": -1,
         "boosting_type": "gbdt",
-        "learning_rate": 0.02,
+        "learning_rate": 0.1,
         "num_leaves": trial.suggest_int("num_leaves", 32, 256),
         "min_child_samples": trial.suggest_int("min_child_samples", 5, 1000),
         "max_depth": -1,
@@ -68,7 +68,7 @@ def objective(trial, X, y, config):
         model_lgb = lgb.train(
             lgb_params,
             lgb_train,
-            num_boost_round=1000,
+            num_boost_round=5000,
             valid_sets=[lgb_val],
             callbacks=[lgb.early_stopping(stopping_rounds=100), LightGBMPruningCallback(trial, "rmse")],
         )

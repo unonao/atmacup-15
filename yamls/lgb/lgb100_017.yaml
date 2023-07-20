@@ -27,7 +27,7 @@ params:
   metric: rmse
   verbosity: -1
   boosting_type: gbdt
-  learning_rate: 0.02
+  learning_rate: 0.1
   num_leaves: 252
   min_child_samples: 66
   max_depth: -1
@@ -39,3 +39,6 @@ params:
   bagging_freq: 2
   max_bin: 200
   device: gpu  # Use GPU
+
+
+# [I 2023-07-20 08:04:36,389] Trial 11 finished with value: 1.106946435096596 and parameters: {'num_leaves': 218, 'min_child_samples': 33, 'feature_fraction': 0.42597391394422096, 'bagging_fraction': 0.767376897532188, 'reg_alpha': 1.3738614345099292e-08, 'reg_lambda': 1.2692209867235797e-08, 'bagging_freq': 7}. Best is trial 11 with value: 1.106946435096596.

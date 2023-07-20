@@ -386,6 +386,42 @@ class UserNum(Feature):
         self.test = df[train.shape[0] :]
 
 
+class UserNumHighHop(Feature):
+    def create_features(self):
+        """
+        作品に関係する人数の特徴量
+        2-hop先の情報まで集約する
+        """
+        df = features[user_num_cols + ["user_id", "anime_id"]].copy()
+
+        use_cols = user_num_cols.copy()
+        for col in user_num_cols:
+            if col != "members":
+                new_col = f"{col}_norm"
+                use_cols.append(new_col)
+                df[new_col] = df[col] / df["members"]
+
+        # userごとに特徴量を集約する
+        user_stats = df[use_cols + ["user_id"]].groupby("user_id").agg(["mean", "max", "min", "sum"])
+        user_stats_columns = ["_".join(col).strip() for col in user_stats.columns.values]
+        user_stats.columns = user_stats_columns
+        user_stats.reset_index(inplace=True)
+
+        # アニメに対して「そのアニメを見たユーザー」が複数存在するので、そのユーザー達のuser_statsをさらに集約してアニメの特徴量 anime_stats を作る
+        tmp = df[["anime_id", "user_id"]].copy().merge(user_stats, on="user_id", how="left").drop("user_id", axis=1)
+        anime_stats = tmp[user_stats_columns + ["anime_id"]].groupby("anime_id").agg(["mean", "max", "min", "sum"])
+        anime_stats_columns = ["_".join(col).strip() for col in anime_stats.columns.values]
+        anime_stats.columns = anime_stats_columns
+        anime_stats.reset_index(inplace=True)
+
+        # できた特徴量を df に結合する
+        high_df = df.merge(anime_stats, on="anime_id", how="left")
+        high_df = high_df[anime_stats_columns]
+
+        self.train = high_df[: train.shape[0]]
+        self.test = high_df[train.shape[0] :]
+
+
 class UserNumSecond(Feature):
     def create_features(self):
         """

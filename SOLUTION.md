@@ -9,11 +9,15 @@
 
 ## 基本的な戦略
 
+### seen ユーザーと unseen ユーザー用のモデルを２つ作る（CV や Fold の切り方について）
+
 - **要約**：seen ユーザー用のモデルを作って seen ユーザーの予測をし、unseen ユーザー用のモデルを作って unseen ユーザーの予測をする。手元の CV score は、seen CV *0.77 + unseen CV* 0.23 で見積もる
 
 詳細についてはすでにディスカッションに記載済みです。
 
 - [オススメの Fold の切り方と信頼できるCVについての説明：seen と unseen ユーザー用に分ける](https://www.guruguru.science/competitions/21/discussions/3e3f5be8-7414-439a-b79f-f3d7e004d920/)
+
+### 利用したモデルの簡単な説明
 
 seen 用か unseen 用かで利用モデルは違うのですが
 
@@ -21,6 +25,8 @@ seen 用か unseen 用かで利用モデルは違うのですが
 - Neural Network
 - Surprise などのExplicit Feedback 用の モデル
 - LightGCN (seen 用)
+
+などです。
 
 ## 利用特徴量
 
