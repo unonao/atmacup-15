@@ -10,7 +10,8 @@ seen:
 
 unseen:
   - 201_stratify_importance/950741e2 # 1.3659
-  - 201_stratify_importance/ec100242
+  - 201_stratify_importance/ec100242 # # 1.365
+  - 201_stratify_importance/a8411db8 # 1.367
   - 041_nn_unseen_scheduler/81fb0f42 # 1.384 NN
   - 042_nn/3c02d842 # 1.385029073565259 NN
   # - 020_surprise_unseen/4ed7afa2 # 1.441 BaselineOnly
