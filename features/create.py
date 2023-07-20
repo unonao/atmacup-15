@@ -23,6 +23,9 @@ sys.path.append(os.pardir)
 from utils import load_datasets
 from utils.embedding import TextEmbedder
 from utils.gcn import LightGCN
+from sklearn.decomposition import NMF
+from cuml.preprocessing import StandardScaler
+
 
 Feature.dir = "."
 label_feature = "score"
@@ -282,6 +285,41 @@ class MultiHotFeatures(Feature):
         self.test = df[train.shape[0] :]
 
 
+class MultiHotFeaturesNmf(Feature):
+    def create_features(self):
+        df = features[["anime_id"]].copy()
+        multilabel_cols = ["genres", "producers", "licensors", "studios"]
+        multilabel_dfs = []
+
+        all_cols = []
+        for c in multilabel_cols:
+            list_srs = anime[c].map(lambda x: x.split(",")).tolist()
+            mlb = MultiLabelBinarizer()
+            ohe_srs = mlb.fit_transform(list_srs)
+            col_names = [f"ohe_{c}_{name}" for name in mlb.classes_]
+            col_df = pd.DataFrame(ohe_srs, columns=col_names)
+            all_cols += col_names
+            multilabel_dfs.append(col_df)
+
+        multilabel_df = pd.concat(multilabel_dfs, axis=1)
+
+        # ユニーク数が多いので、NMFで次元圧縮する
+        n_components = 30
+        nmf = NMF(n_components=n_components)
+        nmf_arr = nmf.fit_transform(multilabel_df.astype(float))
+        nmf_df = pd.DataFrame(nmf_arr)
+        nmf_df.columns = [f"nmf_multi_hot_{ix}" for ix in range(n_components)]
+        nmf_df["anime_id"] = anime["anime_id"]
+        df = df.merge(nmf_df, on="anime_id", how="left")
+        df = df.drop(["anime_id"], axis=1)
+
+        df = cal_user_grouped_stats(df, ["sum", "mean", "var", "min", "max"]).copy()
+        df = df.fillna(df.mean(axis=0))
+
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
+
 class CategoricalLabelEncoded(Feature):
     def create_features(self):
         """
@@ -471,6 +509,61 @@ class UserNumHighHopSecond(Feature):
 
         self.train = high_df[: train.shape[0]]
         self.test = high_df[train.shape[0] :]
+
+
+class UserNumHighHopSvd(Feature):
+    def create_features(self):
+        """
+        作品に関係する人数の特徴量
+        """
+        df = features[user_num_cols + ["user_id", "anime_id"]].copy()
+
+        use_cols = user_num_cols.copy()
+        for col in user_num_cols:
+            if col != "members":
+                new_col = f"{col}_norm"
+                use_cols.append(new_col)
+                df[new_col] = df[col] / df["members"]
+
+        # userごとに特徴量を集約する
+        user_stats = df[use_cols + ["user_id"]].groupby("user_id").agg(["mean", "max", "min"])
+        user_stats_columns = ["_".join(col).strip() for col in user_stats.columns.values]
+        user_stats.columns = user_stats_columns
+        user_stats.reset_index(inplace=True)
+
+        # アニメに対して「そのアニメを見たユーザー」が複数存在するので、そのユーザー達のuser_statsをさらに集約してアニメの特徴量 anime_stats を作る
+        tmp = df[["anime_id", "user_id"]].copy().merge(user_stats, on="user_id", how="left").drop("user_id", axis=1)
+        anime_stats = tmp[user_stats_columns + ["anime_id"]].groupby("anime_id").agg(["mean", "max", "min"])
+        anime_stats_columns = ["_".join(col).strip() for col in anime_stats.columns.values]
+        anime_stats.columns = anime_stats_columns
+        anime_stats.reset_index(inplace=True)
+
+        # 3 次特徴量も作る
+        tmp = df[["anime_id", "user_id"]].copy().merge(anime_stats, on="anime_id", how="left").drop("anime_id", axis=1)
+        user_stats2 = tmp[anime_stats_columns + ["user_id"]].groupby("user_id").agg(["mean", "max", "min"])
+        user_stats_columns2 = ["_".join(col).strip() for col in user_stats2.columns.values]
+        user_stats2.columns = user_stats_columns2
+        user_stats2.reset_index(inplace=True)
+
+        # できた特徴量を df に結合する
+        high_df = (
+            df.merge(user_stats, on="user_id", how="left")
+            .merge(anime_stats, on="anime_id", how="left")
+            .merge(user_stats2, on="user_id", how="left")
+        )
+        use_cols = user_stats_columns + anime_stats_columns + user_stats_columns2
+
+        scaler = StandardScaler()
+        arr = scaler.fit_transform(high_df[use_cols]).to_numpy()
+
+        # ユニーク数が多いので、SVDで次元圧縮する
+        n_components = 50
+        svd = cuml.TruncatedSVD(n_components=n_components)
+        svd_arr = svd.fit_transform(arr)
+        svd_df = pd.DataFrame(svd_arr, columns=[f"high_hop_svd_{ix}" for ix in range(n_components)])
+
+        self.train = svd_df[: train.shape[0]]
+        self.test = svd_df[train.shape[0] :]
 
 
 class UserNumSecond(Feature):

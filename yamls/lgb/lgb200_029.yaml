@@ -1,0 +1,45 @@
+# ここから features/create.py を破壊的に置き換え
+id: lgb200_029
+
+feats:
+  num:
+    - duration_episodes #duration
+    - genres
+    - user_num
+    - aired
+    - japanese_name
+    - other_string
+    - string_len
+    - implicit_factors
+    - implicit_factors_logistic_matrix_factor
+    - implicit_factors_bpr
+    - multi_hot_features_nmf # multi_hot_features
+    - lightgcn_embedding
+    - svd_lightgcn_embedding
+    - user_num_high_hop_second
+  cat:
+    - categorical_label_encoded # categorical_label_encoded_with_user
+  models: [] # 学習済みモデルの結果を使う
+
+target_name: score
+num_folds : 5
+
+params: 
+  objective: regression
+  metric: rmse
+  verbosity: -1
+  boosting_type: gbdt
+  learning_rate: 0.02
+  num_leaves: 228
+  min_child_samples: 184
+  max_depth: -1
+  subsample_freq: 2
+  bagging_seed: 0
+  feature_fraction: 0.8497712256664451
+  bagging_fraction:  0.6441687387634132
+  reg_alpha: 1.5904621022923552e-07
+  reg_lambda: 1.8352462638429818
+  max_bin: 200
+  device: gpu  # Use GPU
+
+  # : {'num_leaves': 228, 'min_child_samples': 184, 'feature_fraction': 0.8497712256664451, 'bagging_fraction': 0.6441687387634132, 'reg_alpha': 1.5904621022923552e-07, 'reg_lambda': 1.8352462638429818, 'bagging_freq': 2}. Best is trial 21 with value: 1.3827519776508232.
