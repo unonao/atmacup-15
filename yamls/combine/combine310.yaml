@@ -2,6 +2,7 @@ seen:
   - 100_lgb/a47bfbf2 # 1.10106 lgb
   - 100_lgb/3b021e78 # 1.11
   - 100_lgb/0990a068 # 1.141
+  - 100_lgb/4a6eb5cc
   - 000_baseline/4b1b03e6  #1.155 LightGCN
   - 000_baseline/b3d8715a # 1.172 LightGCN layer 2
   # - 033_nn/1ba19fea # 1.147 NN
