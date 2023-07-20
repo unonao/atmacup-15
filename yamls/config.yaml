@@ -5,6 +5,7 @@ defaults:
   - combine: combine300
   - surprise: surprise010
   - nn: nn040
+  - st: st050_001
   - override hydra/job_logging: none # hydraで自動的にログファイルが生成されるのを防ぐ
 
 debug: False

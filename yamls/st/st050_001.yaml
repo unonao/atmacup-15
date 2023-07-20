@@ -1,0 +1,15 @@
+
+id: st050_001
+num_epochs: 1000
+early_stopping: 10
+weight_decay: 0.0004287763209553715
+lr: 0.002
+
+num_aug: 5 # 学習のaugmentation
+
+num_samples: 10
+batch_size: 32 # 256
+embed_dim: 32
+num_tts: 3
+target_name: score
+num_folds : 5

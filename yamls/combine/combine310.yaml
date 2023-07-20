@@ -10,4 +10,4 @@ unseen:
   - 041_nn_unseen_scheduler/81fb0f42 # 1.384 NN
   - 042_nn/3c02d842 # 1.385029073565259 NN
   - 020_surprise_unseen/4ed7afa2 # 1.441 BaselineOnly
-
+  - 050_set_transformer/4d2e1dce #  1.4293341993855615

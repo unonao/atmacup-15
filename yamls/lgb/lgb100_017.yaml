@@ -1,5 +1,5 @@
 
-id: lgb100_016
+id: lgb100_017
 feats:
   num:
     - duration_episodes #duration
@@ -28,14 +28,14 @@ params:
   verbosity: -1
   boosting_type: gbdt
   learning_rate: 0.02
-  num_leaves: 188
-  min_child_samples: 60
+  num_leaves: 252
+  min_child_samples: 66
   max_depth: -1
   bagging_seed: 0
-  feature_fraction: 0.93
-  bagging_fraction: 0.88
-  reg_alpha: 0.009
-  reg_lambda: 0.466
-  bagging_freq: 4
+  feature_fraction: 0.8873480437943789
+  bagging_fraction: 0.6314136444961699
+  reg_alpha: 6.328808534422086e-07
+  reg_lambda: 1.957185440122371e-07
+  bagging_freq: 2
   max_bin: 200
   device: gpu  # Use GPU
