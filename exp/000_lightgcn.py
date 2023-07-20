@@ -224,55 +224,6 @@ def main(config: DictConfig) -> None:
             test_pred = model(data.edge_index[:, test_idx]).cpu().detach().numpy()
             test_preds.append(test_pred)
 
-    for fold, (train_idx, val_idx, test_idx) in enumerate(zip(*k_fold(config.train.num_folds, all_df))):
-        model = LightGCN(
-            num_nodes=data.num_nodes,
-            embedding_dim=config.train.embedding_dim,
-            num_layers=config.train.num_layers,
-        ).to(device)
-        optimizer = torch.optim.Adam(model.parameters(), lr=config.train.lr)
-        best_val_loss = float("inf")
-        early_stopping_counter = 0
-
-        for epoch in tqdm(range(config.train.num_epochs if config.debug is False else 6), desc=f"Fold-{fold+1}"):
-            # train
-            model.train()
-            optimizer.zero_grad()
-            pred = model(data.edge_index[:, train_idx])
-            target = torch.tensor(train_df.loc[train_idx.numpy(), "score"].to_numpy()).float().to(device)
-            loss = F.mse_loss(pred, target).sqrt()
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-            # validation
-            with torch.no_grad():
-                pred = model(data.edge_index[:, val_idx])
-                target = torch.tensor(train_df.loc[val_idx.numpy(), "score"].to_numpy()).float().to(device)
-                val_loss = F.mse_loss(pred, target).sqrt()
-            wandb.log(
-                {"epoch": epoch, f"loss/train/fold-{fold}": loss.item(), f"loss/valid/fold-{fold}": val_loss.item()}
-            )
-            if epoch % config.train.early_stopping == 0:
-                tqdm.write(f"Epoch: {epoch}, Loss: {loss.item()}, Val Loss: {val_loss.item()}")
-
-            # early stopping
-            if val_loss < best_val_loss:
-                best_val_loss = val_loss
-                torch.save(model.state_dict(), output_path / f"model_best_{fold}.pt")
-                early_stopping_counter = 0
-            else:
-                early_stopping_counter += 1
-                if early_stopping_counter >= config.train.early_stopping:
-                    model.load_state_dict(torch.load(output_path / f"model_best_{fold}.pt"))
-                    break
-
-        # testing
-        with torch.no_grad():
-            oof_pred[val_idx.cpu().detach().numpy()] = model(data.edge_index[:, val_idx]).cpu().detach().numpy()
-            test_pred = model(data.edge_index[:, test_idx]).cpu().detach().numpy()
-            test_preds.append(test_pred)
-
     # calculate mean of predictions across all folds
     mean_test_preds = np.mean(test_preds, axis=0)
     # clip

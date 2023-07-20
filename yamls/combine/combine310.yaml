@@ -1,7 +1,9 @@
 seen:
   - 100_lgb/a47bfbf2 # 1.10106 lgb
-  - 000_baseline/8d9ed97c # 1.156 LightGCN
-  #- 033_nn/1ba19fea # 1.147 NN
+  - 100_lgb/3b021e78 # 1.11
+  - 000_baseline/4b1b03e6  #1.155 LightGCN
+  - 000_baseline/b3d8715a # 1.172 LightGCN
+  # - 033_nn/1ba19fea # 1.147 NN
   # - 033_nn/075770b2 # 1.161 NN
   - 010_surprise/4b84f9aa # 1.191 SVDpp
 
@@ -9,5 +11,5 @@ unseen:
   - 201_stratify_importance/950741e2 # 1.3659
   - 041_nn_unseen_scheduler/81fb0f42 # 1.384 NN
   - 042_nn/3c02d842 # 1.385029073565259 NN
-  - 020_surprise_unseen/4ed7afa2 # 1.441 BaselineOnly
+  # - 020_surprise_unseen/4ed7afa2 # 1.441 BaselineOnly
   - 050_set_transformer/4d2e1dce #  1.4293341993855615
