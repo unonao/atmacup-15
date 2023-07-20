@@ -65,7 +65,9 @@ def load_models(model_names, y_true):
     result = minimize(objective, [1.0 / len(dfs_train)] * len(dfs_train), bounds=bounds, constraints=constraints)
     weights = result.x
 
-    print(f"Best weights: {weights}")
+    for i in range(len(model_names)):
+        print(f"{model_names[i]}: {weights[i]:0.4f}")
+    print()
 
     train = pd.Series(cal_weighted_pred(dfs_train, weights))
     test = pd.Series(cal_weighted_pred(dfs_test, weights))
@@ -74,6 +76,7 @@ def load_models(model_names, y_true):
 
 @hydra.main(version_base=None, config_path="../yamls", config_name="config")
 def main(config: DictConfig) -> None:
+    print()
     exp_name = f"{Path(sys.argv[0]).stem}"
     output_path = Path(f"../output/{exp_name}")
     os.makedirs(output_path, exist_ok=True)
@@ -108,6 +111,8 @@ def main(config: DictConfig) -> None:
     sub["score"] = seen_test_df.to_numpy()  # まずはseenで埋める
     sub.loc[unseen_user_test_index, "score"] = unseen_test_df.loc[unseen_user_test_index].to_numpy()  # unseenで代入
     sub.to_csv(output_path / "sub.csv", index=False)
+
+    print()
 
 
 if __name__ == "__main__":
