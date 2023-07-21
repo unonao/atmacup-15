@@ -1,5 +1,5 @@
 
-id: base
+id: gcn060_002
 feats:
   num:
     - duration_episodes #duration
@@ -19,7 +19,7 @@ feats:
 num_epochs: 1000
 early_stopping: 50
 lr: 0.002
-num_layers: 3
-hidden_channels: 64
+num_layers: 2
+hidden_channels: 256
 target_name: score
 num_folds : 5

@@ -1,5 +1,5 @@
 
-id: base
+id: gcn060_001
 feats:
   num:
     - duration_episodes #duration
@@ -9,8 +9,13 @@ feats:
     - japanese_name
     - other_string
     - string_len
-    - multi_hot_features
+    - implicit_factors
+    - implicit_factors_logistic_matrix_factor
     - implicit_factors_bpr
+    - multi_hot_features
+    - lightgcn_embedding
+    - svd_lightgcn_embedding
+    - user_num_high_hop_second
     
   cat: []
   models:  []

@@ -53,7 +53,7 @@ python 031_nn_seen_scheduler.py nn=nn031_006
 python 033_nn.py nn=nn033_002
 python 041_nn_seen_scheduler.py nn=nn040_007
 
-python 060_gcn_seen.py gcn=base debug=True
+python 060_gcn_seen.py gcn=gcn060_001
 
 python 100_lgb.py lgb=lgb100_013
 python 200_lgb.py lgb=lgb200
