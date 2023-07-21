@@ -61,7 +61,7 @@ def k_fold(num_fold, all_df):
 
 import torch
 from torch_geometric.nn import SAGEConv, to_hetero
-from torch.nn import LayerNorm
+from torch.nn import LayerNorm, Dropout
 
 
 class GNNEncoder(torch.nn.Module):

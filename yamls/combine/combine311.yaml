@@ -5,7 +5,7 @@ seen:
   - 100_lgb/a7e26006 # 1.10375 lgb
   - 100_lgb/3b021e78 # 1.11
   - 100_lgb/0990a068 # 1.141
-  - 060_gcn_seen/c6da5f5e # 1.169
+  - 061_gcn/09dd3c62 # 1.147
   - 000_baseline/4b1b03e6  #1.155 LightGCN
   - 000_baseline/b3d8715a # 1.172 LightGCN layer 2
   - 034_nn/ac24d22c # 1.143
