@@ -61,7 +61,7 @@ def k_fold(num_fold, all_df):
 
 import torch
 from torch_geometric.nn import SAGEConv, to_hetero
-from torch.nn import LayerNorm
+from torch.nn import LayerNorm, Dropout
 
 
 class GNNEncoder(torch.nn.Module):
@@ -88,8 +88,10 @@ class GNNEncoder(torch.nn.Module):
         for i in range(self.num_layers):
             x_res = x
             x = self.convs[i](x, edge_index).relu()
-            if i != 0:
-                x += x_res  # Residual Connection
+            if i == 0:
+                x_init = x
+            else:
+                x += x_init
             x = self.norms[i](x)
         return x
 
@@ -189,11 +191,6 @@ def main(config: DictConfig) -> None:
         ).to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=config.gcn.lr)
 
-        optimizer = torch.optim.Adam(model.parameters(), lr=config.gcn.lr, weight_decay=config.gcn.weight_decay)
-        lr_sched = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-            optimizer, T_0=config.gcn.t0, T_mult=config.gcn.t_mult, eta_min=config.gcn.lr * config.gcn.eta_min_rate
-        )
-
         best_val_loss = float("inf")
         early_stopping_counter = 0
         for epoch in tqdm(range(config.gcn.num_epochs if config.debug is False else 6), desc=f"Fold-{fold+1}"):
@@ -211,7 +208,6 @@ def main(config: DictConfig) -> None:
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            lr_sched.step()
 
             # validation
             with torch.no_grad():
