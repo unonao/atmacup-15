@@ -8,8 +8,8 @@ lr: 0.002
 num_aug: 5 # 学習のaugmentation
 
 num_samples: 10
-batch_size: 32 # 256
 embed_dim: 32
-num_tts: 3
+batch_size: 32 # 256
+num_tts: 2
 target_name: score
 num_folds : 5
