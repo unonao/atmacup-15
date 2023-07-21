@@ -1,0 +1,4 @@
+target_name: score
+num_folds : 5
+n_factors : 20
+n_epochs : 20

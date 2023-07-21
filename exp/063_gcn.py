@@ -60,7 +60,7 @@ def k_fold(num_fold, all_df):
 
 
 import torch
-from torch_geometric.nn import SAGEConv, to_hetero
+from torch_geometric.nn import SAGEConv, to_hetero, TransformerConv
 from torch.nn import LayerNorm, Dropout
 
 
@@ -72,20 +72,21 @@ class GNNEncoder(torch.nn.Module):
         self.norms = torch.nn.ModuleList()
 
         # 初めのレイヤー
-        self.convs.append(SAGEConv((-1, -1), hidden_channels))
+        self.convs.append(TransformerConv((-1, -1), hidden_channels))
         self.norms.append(LayerNorm(hidden_channels))
 
         # 中間のレイヤー
         for _ in range(num_layers - 2):
-            self.convs.append(SAGEConv((-1, -1), hidden_channels))
+            self.convs.append(TransformerConv((-1, -1), hidden_channels))
             self.norms.append(LayerNorm(hidden_channels))
 
         # 最後のレイヤー
-        self.convs.append(SAGEConv((-1, -1), out_channels))
+        self.convs.append(TransformerConv((-1, -1), hidden_channels))
         self.norms.append(LayerNorm(out_channels))
 
     def forward(self, x, edge_index):
         for i in range(self.num_layers):
+            x_res = x
             x = self.convs[i](x, edge_index).relu()
             if i == 0:
                 x_init = x

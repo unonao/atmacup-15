@@ -12,17 +12,43 @@ docker compose up
 
 ## final submission
 
+```
+bash gcn.sh
+```
+
 どのようなアンサンブルを行うか
 
 - seen
-  - LightGCN: (000_baseline.py)
-  - LightGBM(target無し): (100_lgb.py)
-  - LightGBM(targetあり): (101_lgb_target.py)
-  - NN : (034_nn.py)
-  - CF系
+  [ ] LightGCN (000_baseline.py) : `python 000_baseline.py  train=base005` doing
+    [x] パラメータ調整
+    [x] fold数の調整: 10
+    [x] 学習率を下げる（もっと下げる。。。？）
+  [] LightGBM target無し (100_lgb.py) : `python 100_lgb.py lgb=lgb100_021`
+    [x] パラメータ調整
+    [x] 特徴量の確定
+    [x] fold数の調整: 10
+    [x] 学習率を下げる
+  [] LightGBM targetあり (101_lgb_target.py): `python 101_lgb_target.py lgb=lgb100_021`
+  [] GCN (062_gcn.py) : `python 063_gcn.py gcn=gcn060_003`
+    [] パラメータ調整 : `bash gcn.sh`
+    [x] 特徴量の確定
+    [] fold数の調整: 10
+    [] 学習率を下げる
+  [] CF系  (010_surprise): `python 011_svdpp.py surprise=surprise011`
+    [] パラメータ調整  `bash surprise.sh`
+    [x] 特徴量の確定
+    [] fold数の調整: 10
+    [] 学習率を下げる
+  [] NN  (034_nn.py):
+    [] fold数の調整: 10
+    [] 学習率を下げる
 - unseen
-  - LightGBM(target無し): (201_strutify_importance.py)
-  - LightGBM(targetあり): (101_lgb_target.py)
+  - LightGBM target無し : (201_strutify_importance.py)
+    [ ] パラメータ調整
+    [x] 特徴量の確定
+    [ ] fold数の調整: 10
+    [ ] 学習率を下げる
+  - LightGBM targetあり: (101_lgb_target.py)
   - NN : (042_nn.py)
   - CF系
 
@@ -43,6 +69,7 @@ python create.py
 """sh
 cd exp
 python 000_baseline.py  train.embedding_dim=6000 train.num_layers=5
+python 000_baseline.py  train=base005
 
 python 001_lightgcn_agg.py debug=True train=train001
 python 005_lightgcn_unseen.py debug=True train=000_lightgcn.yaml
