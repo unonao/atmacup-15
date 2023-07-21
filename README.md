@@ -10,6 +10,22 @@ docker compose run kaggle bash
 docker compose up
 """
 
+## final submission
+
+どのようなアンサンブルを行うか
+
+- seen
+  - LightGCN: (000_baseline.py)
+  - LightGBM(target無し): (100_lgb.py)
+  - LightGBM(targetあり): (101_lgb_target.py)
+  - NN : (034_nn.py)
+  - CF系
+- unseen
+  - LightGBM(target無し): (201_strutify_importance.py)
+  - LightGBM(targetあり): (101_lgb_target.py)
+  - NN : (042_nn.py)
+  - CF系
+
 ## 初期設定
 
 input/atmaCup15_dataset にデータを配置
@@ -36,6 +52,9 @@ python 010_surprise.py surprise.name=SVD debug=True
 python 031_nn_seen_scheduler.py nn=nn031_006
 python 033_nn.py nn=nn033_002
 python 041_nn_seen_scheduler.py nn=nn040_007
+
+python 060_gcn_seen.py gcn=base debug=True
+
 python 100_lgb.py lgb=lgb100_013
 python 200_lgb.py lgb=lgb200
 python 201_stratify.py lgb=lgb200_017

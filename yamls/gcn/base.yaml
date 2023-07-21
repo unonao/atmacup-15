@@ -1,0 +1,25 @@
+
+id: nn042_001
+feats:
+  num:
+    - duration_episodes #duration
+    - genres
+    - user_num
+    - aired
+    - japanese_name
+    - other_string
+    - string_len
+    - multi_hot_features
+    - implicit_factors_bpr
+    
+  cat: []
+  models:  []
+
+
+num_epochs: 1000
+early_stopping: 50
+lr: 0.002
+num_layers: 3
+hidden_channels: 64
+target_name: score
+num_folds : 5

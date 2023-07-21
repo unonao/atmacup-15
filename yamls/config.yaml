@@ -6,6 +6,7 @@ defaults:
   - surprise: surprise010
   - nn: nn040
   - st: st050_001
+  - gcn: base
   - override hydra/job_logging: none # hydraで自動的にログファイルが生成されるのを防ぐ
 
 debug: False
