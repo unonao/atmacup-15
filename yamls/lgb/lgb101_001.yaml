@@ -1,0 +1,46 @@
+
+# id: lgb100_019
+id: lgb101_001
+feats:
+  num:
+    - duration_episodes #duration
+    - genres
+    - user_num
+    - aired
+    - japanese_name
+    - other_string
+    - string_len
+    - implicit_factors
+    - implicit_factors_logistic_matrix_factor
+    - implicit_factors_bpr
+    - multi_hot_features
+    - lightgcn_embedding
+    - user_num_high_hop_second
+  cat:
+    - categorical_label_encoded_with_user # categorical_label_encoded
+  models: [] # 学習済みモデルの結果を使う
+
+
+target_name: score
+num_folds : 5
+
+params: 
+  objective: regression
+  metric: rmse
+  verbosity: -1
+  boosting_type: gbdt
+  learning_rate: 0.05
+  num_leaves: 252
+  min_child_samples: 66
+  max_depth: -1
+  bagging_seed: 0
+  feature_fraction: 0.8873480437943789
+  bagging_fraction: 0.6314136444961699
+  reg_alpha: 6.328808534422086e-07
+  reg_lambda: 1.957185440122371e-07
+  bagging_freq: 2
+  max_bin: 200
+  device: gpu  # Use GPU
+
+
+# [I 2023-07-20 08:04:36,389] Trial 11 finished with value: 1.106946435096596 and parameters: {'num_leaves': 218, 'min_child_samples': 33, 'feature_fraction': 0.42597391394422096, 'bagging_fraction': 0.767376897532188, 'reg_alpha': 1.3738614345099292e-08, 'reg_lambda': 1.2692209867235797e-08, 'bagging_freq': 7}. Best is trial 11 with value: 1.106946435096596.
