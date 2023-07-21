@@ -14,6 +14,7 @@ docker compose up
 
 ```
 bash gcn.sh
+bash surprise.sh
 ```
 
 どのようなアンサンブルを行うか

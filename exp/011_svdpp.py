@@ -31,6 +31,13 @@ sys.path.append(os.pardir)
 from utils import load_datasets, load_target, evaluate_score, load_sample_sub
 
 
+# 同様のランダムシード設定関数
+def seed_everything(seed=1234):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+
+
 algo_dict = {
     "BaselineOnly": BaselineOnly,
     "KNNWithMeans": KNNWithMeans,
@@ -48,6 +55,7 @@ algo_dict = {
 
 @hydra.main(version_base=None, config_path="../yamls", config_name="config")
 def main(config: DictConfig) -> None:
+    seed_everything(config.seed)
     exp_name = f"{Path(sys.argv[0]).stem}/{str(uuid.uuid1())[:8]}"
     output_path = Path(f"../output/{exp_name}")
     os.makedirs(output_path, exist_ok=True)
@@ -67,18 +75,18 @@ def main(config: DictConfig) -> None:
     sub = pd.read_csv(Path(config.input_path) / "sample_submission.csv")
 
     if config.debug:
-        sample_index = train_df.sample(100).index
+        sample_index = train_df.sample(1000).index
         train_df = train_df.iloc[sample_index].reset_index(drop=True)
-        test_df = test_df.head(100)
-        sub = sub.head(100)
+        test_df = test_df.head(1000)
+        sub = sub.head(1000)
 
     test_df["score"] = 0
 
     oof_pred = np.zeros(train_df.shape[0])
     y_preds = []
 
-    kf = StratifiedKFold(n_splits=config.surpise.num_folds, shuffle=True, random_state=config.seed)
-    for fold, (train_index, valid_index) in enumerate(kf.split(train_df, train_df["score"])):
+    kf = StratifiedKFold(n_splits=config.surprise.num_folds, shuffle=True, random_state=config.seed)
+    for fold, (train_index, valid_index) in enumerate(kf.split(train_df, train_df["user_id"])):
         X_train, X_valid = (train_df.iloc[train_index, :], train_df.iloc[valid_index, :])
         reader = Reader(rating_scale=(1, 10))
         train_data = Dataset.load_from_df(X_train[["user_id", "anime_id", "score"]], reader).build_full_trainset()
@@ -93,7 +101,7 @@ def main(config: DictConfig) -> None:
             .build_testset()
         )
 
-        algo = SVDpp(n_factors=config.surprise.n_factors, n_epochs=config.surprise.n_epochs)
+        algo = SVDpp(n_factors=config.surprise.n_factors, n_epochs=config.surprise.n_epochs, random_state=config.seed)
         _ = algo.fit(train_data)
 
         y_valid_pred = algo.test(valid_set)
