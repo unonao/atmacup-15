@@ -75,7 +75,7 @@ from rapidfuzz.process import cdist
 class TextEmbedding(Feature):
     def create_features(self):
         """
-        言語モデルによる埋込情報と、同一user_id内でのコサイン類似度の統計量を算出する
+        言語モデルによる埋込情報
         """
         # 文字列として扱う列を結合し、元の列を落とす
         concat_feature = ["japanese_name", "genres", "producers", "licensors", "studios", "rating"]
