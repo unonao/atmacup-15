@@ -16,6 +16,8 @@ from sklearn.model_selection import StratifiedKFold
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 sys.path.append(os.pardir)
 from utils import load_datasets, load_target, evaluate_score, load_sample_sub
@@ -97,6 +99,23 @@ def main(config: DictConfig) -> None:
         print(importance.head())
         print("tail importance")
         print(importance.tail())
+        # Set N
+        N = 60
+        # New: Plotting the top N feature importance
+        plt.figure(figsize=(8, 12))
+        sns.barplot(x="importance", y=importance.index[:N], data=importance[:N])
+        plt.title(f"Top {N} LightGBM Feature Importance")
+        plt.tight_layout()
+        plt.savefig(output_path / f"top_feature_importance_{fold}.png")
+        plt.close()
+
+        # New: Plotting the bottom N feature importance
+        plt.figure(figsize=(8, 12))
+        sns.barplot(x="importance", y=importance.index[-N:], data=importance[-N:])
+        plt.title(f"Bottom {N} LightGBM Feature Importance")
+        plt.tight_layout()
+        plt.savefig(output_path / f"bottom_feature_importance_{fold}.png")
+        plt.close()
     mean_y_preds = np.mean(y_preds, axis=0)
 
     # 範囲内にする
