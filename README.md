@@ -14,8 +14,8 @@ docker compose up
 
 ```sh
 python 100_lgb.py lgb=lgb100_021
+python 101_lgb_target.py lgb=lgb100_021
 python 011_svdpp.py surprise=surprise011
-
 
 ```
 
@@ -26,17 +26,17 @@ python 011_svdpp.py surprise=surprise011
     [x] パラメータ調整
     [x] fold数の調整: 10
     [x] 学習率を下げる（もっと下げる。。。？）
+  [] GCN (062_gcn.py) : `python 064_gcn.py gcn=gcn060_005`
+    [x] パラメータ調整 : `bash gcn.sh`
+    [x] 特徴量の確定
+    [x] fold数の調整: 10
+    [x] 学習率を下げる
   [] LightGBM target無し (100_lgb.py) : `python 100_lgb.py lgb=lgb100_021`
     [x] パラメータ調整
     [x] 特徴量の確定
     [x] fold数の調整: 10
     [x] 学習率を下げる
   [] LightGBM targetあり (101_lgb_target.py): `python 101_lgb_target.py lgb=lgb100_021`
-  [] GCN (062_gcn.py) : `python 064_gcn.py gcn=gcn060_005`
-    [x] パラメータ調整 : `bash gcn.sh`
-    [x] 特徴量の確定
-    [x] fold数の調整: 10
-    [] 学習率を下げる
   [] CF系  (010_surprise): `python 011_svdpp.py surprise=surprise011`
     [x] パラメータ調整
     [x] 特徴量の確定
@@ -50,7 +50,7 @@ python 011_svdpp.py surprise=surprise011
     [x] 特徴量の確定
     [ ] fold数の調整: 10
     [ ] 学習率を下げる
-  - LightGBM targetあり: (101_lgb_target.py)
+  - LightGBM targetあり: (202_target.py)
   - NN : (042_nn.py)
   - CF系
 

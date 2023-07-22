@@ -5,7 +5,8 @@ seen:
   # hetero-gcn
   - 064_gcn/ef59ebd2 # 2層 1.137 python 064_gcn.py gcn=gcn060_005
   - 064_gcn/3992e11c # 2層 1.137 python 064_gcn.py gcn=gcn060_006 
-  - 064_gcn/0253280e # 5層
+  - 064_gcn/380d2a1a # 2層 20fold python 064_gcn.py gcn=gcn060_008
+  - 064_gcn/0253280e # 5層 python 064_gcn.py gcn=gcn060_007
   #  python 064_gcn.py gcn=gcn060_007
 
   # lgb
