@@ -10,5 +10,8 @@ def print_score(seen, unseen):
     print(f"score: {score}, score2: {score2}")
 
 
-print_score(1.0873283238278961, 1.3525044146343264)  # 014
-print_score(1.0862292649451508, 1.3519037725794139)  # 015 暫定
+print_score(1.0862292649451508, 1.3519037725794139)  # 015 linear
+
+# 未サブ
+print_score(1.0838408226511915, 1.3519037725794139)  # 016 linear
+print_score(1.0794302161264508, 1.35084852596117)  # 017 linear

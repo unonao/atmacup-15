@@ -13,6 +13,7 @@ seen:
   - 100_lgb/a47bfbf2 # 1.10106 lgb
   - 100_lgb/a7e26006 # 1.10375 lgb
   - 100_lgb/3b021e78 # 1.11
+  - 100_lgb/43bd8ccc # 1.095 lgb python 100_lgb.py lgb=lgb100_021 
   - 101_lgb_target/8331ef28 # 1.116 target encode lgb
   - 101_lgb_target/35bc4eb6 # 1.10336 target  
   - 034_nn/ac24d22c # 1.143
