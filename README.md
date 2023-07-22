@@ -13,6 +13,7 @@ docker compose up
 ## final submission
 
 ```sh
+python 304_combine.py combine=combine317 +model=elastic
 python 070_tvttformer_seen.py tvtt=base
 python 080_tvttformer_unseen.py tvtt=base
 

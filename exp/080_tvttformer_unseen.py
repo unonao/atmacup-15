@@ -86,8 +86,8 @@ class UserDataset(Dataset):
         pad_length = self.max_padding - anime_tensor.size(0)
 
         # unseen用 (user_tensorは入れない）
-        attention_mask = torch.zeros([self.max_padding, self.max_padding], dtype=torch.bool)
-        attention_mask[: anime_tensor.size(0), : anime_tensor.size(0)] = True
+        attention_mask = torch.zeros([self.max_padding], dtype=torch.bool)
+        attention_mask[: anime_tensor.size(0)] = True
         input_tensor = torch.cat((anime_tensor, torch.zeros(pad_length, dtype=torch.int32)))
         mode_tensor = torch.cat(
             (
@@ -166,7 +166,7 @@ class TransformerModel(nn.Module):
         anime_x = self.anime_embedding(x[:, 1:])
         x = torch.cat([user_x, anime_x], dim=1)
         """
-        x = self.transformer_encoder(x)
+        x = self.transformer_encoder(x, src_key_padding_mask=attention_mask)
         output = self.fc(x).squeeze(2)
         return output
 
@@ -215,7 +215,7 @@ def main(config: DictConfig) -> None:
     all_df["anime_label"], anime_idx = pd.factorize(all_df["anime_id"])
 
     wandb.init(
-        project="atmacup-21",
+        project="atmacup-21-unseen",
         name=exp_name,
         mode="online" if config.debug is False else "disabled",
         config=OmegaConf.to_container(config.tvtt),
