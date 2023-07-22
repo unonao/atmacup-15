@@ -1,6 +1,7 @@
 seen:
   # lightgcn
   - 000_baseline/14522c68 # 1.145 2層 python 000_baseline.py  train=base006
+  - 000_baseline/8465fe04 # 1.145 python 000_baseline.py  train=base006 seed=2
   - 000_baseline/6dd50b78 # 1.145 5層 python 000_baseline.py  train=base007
   - 000_baseline/c3a00906
   - 000_baseline/d0c3893e
@@ -55,7 +56,7 @@ unseen:
   - 041_nn_unseen_scheduler/efd018ec
   - 041_nn_unseen_scheduler/a7e1bb00
   - 041_nn_unseen_scheduler/c631bc88
-
+  - 042_nn/858cd5e6 #  python 042_nn.py nn=nn042_003 seed=8
 
   # st
   - 050_set_transformer/4d2e1dce #  1.4293341993855615
@@ -72,4 +73,4 @@ unseen:
   #- 020_surprise_unseen/bda353f0 # 1.563 KNNWithMeans
   #- 020_surprise_unseen/72a42a50 # 1.563 KNNBasic
   - 080_tvttformer_unseen/808a63d8
-# predicted score2: 1.1439535074012226
+# predicted score2: 1.1437919137299146

@@ -1,0 +1,32 @@
+
+id: nn042_002
+feats:
+  num:
+    - duration_episodes #duration
+    - genres
+    - user_num
+    - aired
+    - japanese_name
+    - other_string
+    - string_len
+    - implicit_factors
+    - implicit_factors_logistic_matrix_factor
+    - implicit_factors_bpr
+    - multi_hot_features
+    - lightgcn_embedding
+    - text_embedding
+    
+  cat: []
+  models: []
+
+
+num_epochs: 50
+early_stopping: 10
+weight_decay: 0.000913811011323623
+dropout_rate: 0.24947613732598084
+lr: 0.002
+batch_size: 135
+num_layers: 3
+hidden_dim: 135
+target_name: score
+num_folds : 6
