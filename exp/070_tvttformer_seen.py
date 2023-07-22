@@ -413,7 +413,9 @@ def main(config: DictConfig) -> None:
                 n_iter=num_train_iter,
                 scaler=scaler,
             )
-            val_preds, val_loss, val_time = val_one_epoch(cfg=config.tvtt, model=model, dataloader=eval_loader)
+            val_preds, val_loss1, val_time = val_one_epoch(cfg=config.tvtt, model=model, dataloader=eval_loader)
+            val_preds, val_loss2, val_time = val_one_epoch(cfg=config.tvtt, model=model, dataloader=eval_loader)
+            val_loss = (val_loss1+val_loss2)/2
             tqdm.write(f"Epoch {epoch} : Train loss {train_loss:.3f} Val loss: {val_loss:.3f}")
             wandb.log(
                 {"epoch": epoch, f"nn/train_loss/fold-{fold}": train_loss, f"nn/valid_loss/fold-{fold}": val_loss}
