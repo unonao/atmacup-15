@@ -72,6 +72,86 @@ from rapidfuzz.fuzz import partial_ratio
 from rapidfuzz.process import cdist
 
 
+import igraph as ig
+
+
+class GraphFeature(Feature):
+    def create_features(self):
+        """
+        ２部グラフの頂点のproperty を特徴量にする
+        """
+        df = features[["user_id", "anime_id"]].copy()
+
+        df["user_label"], user_idx = pd.factorize(df["user_id"])
+        df["anime_label"], anime_idx = pd.factorize(df["anime_id"])
+        df["anime_label"] += len(user_idx)  # userとanimeの番号が別になるようにずらす
+
+        # ユニークなIDを持つ頂点のリストを作成
+        users = df["user_label"].unique().tolist()
+        animes = df["anime_label"].unique().tolist()
+        vertices = users + animes
+        vertices = sorted(vertices)
+
+        # エッジを作成
+        edges = list(zip(df["user_label"], df["anime_label"]))
+        # グラフを作成
+        g = ig.Graph(vertex_attrs={"name": vertices}, edges=edges, directed=False)
+
+        pageranks = g.pagerank()
+        print("PageRank:", len(pageranks))
+        betweenness = g.betweenness()
+        print("betweenness:", len(betweenness))
+        eigenvector_centrality = g.eigenvector_centrality()
+        print("eigenvector_centrality:", len(eigenvector_centrality))
+        hub_score = g.hub_score()
+        print("hub_score:", len(hub_score))
+        authority_score = g.authority_score()
+        print("authority_score:", len(authority_score))
+        constraint = g.constraint()
+        print("constraint:", len(constraint))
+        degree = g.degree()
+        print("degree:", len(degree))
+        coreness = g.coreness()
+        print("coreness:", len(coreness))
+        eccentricity = g.eccentricity()
+        print("eccentricity:", len(eccentricity))
+        harmonic_centrality = g.harmonic_centrality()
+        print("harmonic_centrality:", len(harmonic_centrality))
+        node_df = pd.DataFrame(
+            {
+                "degree": degree,
+                "pageranks": pageranks,
+                "betweenness": betweenness,
+                "eigenvector_centrality": eigenvector_centrality,
+                "hub_score": hub_score,
+                "authority_score": authority_score,
+                "constraint": constraint,
+                "coreness": coreness,
+                "eccentricity": eccentricity,
+                "harmonic_centrality": harmonic_centrality,
+            }
+        )
+        node_cols = node_df.columns
+        user_df = node_df[: len(user_idx)].copy()
+        anime_df = node_df[len(user_idx) :].copy().reset_index(drop=True)
+        user_df.columns = [f"user_{col}" for col in node_cols]
+        anime_df.columns = [f"anime_{col}" for col in node_cols]
+        user_df["user_id"] = user_idx
+        anime_df["anime_id"] = anime_idx
+
+        df = df.merge(user_df, on="user_id", how="left").merge(anime_df, on="anime_id", how="left")
+
+        use_cols = []
+        for col in node_cols:
+            df[f"{col}_diff"] = df[f"user_{col}"] / df[f"anime_{col}"]
+            use_cols.append(f"{col}_diff")
+            use_cols.append(f"user_{col}")
+            use_cols.append(f"anime_{col}")
+
+        df = df[use_cols]
+        self.train = df[: train.shape[0]]
+        self.test = df[train.shape[0] :]
+
 class TextEmbedding(Feature):
     def create_features(self):
         """

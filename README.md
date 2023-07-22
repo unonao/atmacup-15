@@ -12,15 +12,14 @@ docker compose up
 
 ## final submission
 
-```
-bash gcn.sh
-bash surprise.sh
+```sh
+python 100_lgb.py lgb=base003 # fold0: 1.12155 以上かどうか
 ```
 
 どのようなアンサンブルを行うか
 
 - seen
-  [ ] LightGCN (000_baseline.py) : `python 000_baseline.py  train=base005` doing
+  [x] LightGCN (000_baseline.py) : `python 000_baseline.py  train=base005`
     [x] パラメータ調整
     [x] fold数の調整: 10
     [x] 学習率を下げる（もっと下げる。。。？）

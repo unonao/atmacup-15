@@ -1,5 +1,5 @@
-# fold0: 1.12067
-id: base
+
+id: base003
 feats:
   num:
     - duration_episodes #duration
@@ -12,6 +12,7 @@ feats:
     - implicit_factors_bpr
     - multi_hot_features
     - user_num_high_hop_second
+    - graph_feature
   cat:
     - categorical_label_encoded_with_user # categorical_label_encoded
   models: [] # 学習済みモデルの結果を使う

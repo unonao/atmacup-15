@@ -1,8 +1,5 @@
 
 hidden_channelss=(
-  "32"
-  "64"
-  "256"
   "512"
   "1024"
 )
@@ -16,6 +13,8 @@ num_layerss=(
 
 for hidden_channels in "${hidden_channelss[@]}"; do
 for num_layers in "${num_layerss[@]}"; do
-  python 063_gcn.py  gcn=gcn060_003 "gcn.hidden_channels=${hidden_channels}" "gcn.num_layers=${num_layers}"
+  echo ${hidden_channels} ${num_layers}
+  python 062_gcn.py  gcn=gcn060_003 "gcn.hidden_channels=${hidden_channels}" "gcn.num_layers=${num_layers}"
+  echo 
 done
 done
