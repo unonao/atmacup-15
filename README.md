@@ -13,7 +13,6 @@ docker compose up
 ## final submission
 
 ```sh
-python 201_stratify_importance.py lgb=lgb200_031 # unseen に fold 10 いるか？という気持ちはある
 
 # 夜用
 python 100_lgb.py lgb=lgb100_021 # 多分1回2.5時間くらいかかる
