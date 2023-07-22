@@ -21,13 +21,11 @@ feats:
 
 num_epochs: 50
 early_stopping: 10
-weight_decay: 0.0008783056531097395
-dropout_rate: 0.4906275199604325
+weight_decay: 0.000913811011323623
+dropout_rate: 0.24947613732598084
 lr: 0.002
-batch_size: 128
-num_layers: 4
-hidden_dim: 106
+batch_size: 135
+num_layers: 3
+hidden_dim: 135
 target_name: score
 num_folds : 10
-
-# fold 10, 新しいパラメータでチューニング

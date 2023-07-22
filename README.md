@@ -13,13 +13,10 @@ docker compose up
 ## final submission
 
 ```sh
+python 303_combine.py combine=combine318
 python 304_combine.py combine=combine317 +model=linear
 python 070_tvttformer_seen.py tvtt=base
 python 080_tvttformer_unseen.py tvtt=base
-
-# 夜用
-python 100_lgb.py lgb=lgb100_021 # 多分1回2.5時間くらいかかる
-python 101_lgb_target.py lgb=lgb100_021
 ```
 
 どのようなアンサンブルを行うか

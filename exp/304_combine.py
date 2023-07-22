@@ -16,11 +16,12 @@ from itertools import product
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.linear_model import LinearRegression, ElasticNet
+from lightgbm import LGBMRegressor
 
 sys.path.append(os.pardir)
 from utils import load_datasets, load_target, evaluate_score, load_sample_sub
 
-model_dict = {"linear": LinearRegression(), "elastic": ElasticNet(alpha=0.1, l1_ratio=0.1)}
+model_dict = {"linear": LinearRegression(), "elastic": ElasticNet(alpha=0.1, l1_ratio=0.1), "lgb": LGBMRegressor()}
 
 
 def load_models(config, model_names, y_true):
@@ -40,7 +41,6 @@ def load_models(config, model_names, y_true):
     preds = np.zeros(len(train_x))
     preds_test = np.zeros(len(test_x))
     n_splits = 5
-    weights = np.zeros(train_x.shape[1])
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=8)
     for i, (tr_idx, va_idx) in enumerate(kf.split(train_x)):
         tr_x, va_x = train_x.iloc[tr_idx], train_x.iloc[va_idx]
@@ -51,14 +51,9 @@ def load_models(config, model_names, y_true):
         preds[va_idx] = pred
         pred_test = model.predict(test_x)
         preds_test += pred_test / n_splits
-        weights += model.coef_ / n_splits
 
     preds = np.clip(preds, 1, 10)
     preds_test = np.clip(preds_test, 1, 10)
-
-    for i in range(len(model_names)):
-        print(f"{model_names[i]}: {weights[i]:0.4f}")
-    print()
 
     train = pd.Series(preds)
     test = pd.Series(preds_test)

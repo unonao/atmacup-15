@@ -7,11 +7,13 @@ c_unseen = 0.22735307114449846
 def print_score(seen, unseen):
     score = c_seen * seen + c_unseen * unseen
     score2 = math.sqrt(c_seen * seen**2 + c_unseen * unseen**2)
-    print(f"score: {score}, score2: {score2}")
+    print(f"seen:{seen:0.5f}, unseen: {unseen:0.5f},  score: {score:0.5f}, score2: {score2:0.5f}")
 
 
-print_score(1.0862292649451508, 1.3519037725794139)  # 015 linear
-
-# 未サブ
-print_score(1.0838408226511915, 1.3519037725794139)  # 016 linear
-print_score(1.0794302161264508, 1.35084852596117)  # 017 linear
+print_score(1.0838408226511915, 1.3519037725794139)  # 016 linear # 未サブ
+print_score(1.0862292649451508, 1.3519037725794139)  # 015 linear 1.1721
+print_score(1.0794302161264508, 1.35084852596117)  # 017 linear 1.1675
+print_score(1.0788609685619033, 1.35084852596117)  # 018 # 未サブ
+print_score(1.0765981445833601, 1.35084852596117)  # 019 # 未サブ
+print_score(1.0763797486419528, 1.3500891660509984)  # 020 # 未サブ
+print_score(1.0763797486419528, 1.3485249836424367)  # 021 # 未サブ
