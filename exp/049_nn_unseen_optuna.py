@@ -95,10 +95,10 @@ def prepare_data(X_train_all, X_test):
 
 
 def objective(trial, config: DictConfig, X_train_all, X_test, y_train_all, train_user_ids):
-    seed_everything()
+    seed_everything(config.seed)
     # ハイパーパラメータのサジェスチョン
-    n_layers = trial.suggest_int("n_layers", 2, 5)
-    hidden_dim = trial.suggest_int("hidden_dim", 64, 4096, log=True)
+    n_layers = trial.suggest_int("n_layers", 1, 6)
+    hidden_dim = trial.suggest_int("hidden_dim", 64, 1024, log=True)
     dropout_rate = trial.suggest_float("dropout_rate", 0.1, 0.6)
     weight_decay = trial.suggest_loguniform("weight_decay", 1e-8, 1e-3)
 

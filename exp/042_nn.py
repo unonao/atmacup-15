@@ -94,7 +94,7 @@ def prepare_data(X_train_all, X_test):
 # メインの学習ループ
 @hydra.main(version_base=None, config_path="../yamls", config_name="config")
 def main(config: DictConfig) -> None:
-    seed_everything()
+    seed_everything(config.seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     exp_name = f"{Path(sys.argv[0]).stem}/{str(uuid.uuid1())[:8]}"
     output_path = Path(f"../output/{exp_name}")

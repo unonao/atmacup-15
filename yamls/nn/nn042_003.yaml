@@ -1,0 +1,33 @@
+
+id: nn042_002
+feats:
+  num:
+    - duration_episodes #duration
+    - genres
+    - user_num
+    - aired
+    - japanese_name
+    - other_string
+    - string_len
+    - implicit_factors
+    - implicit_factors_logistic_matrix_factor
+    - implicit_factors_bpr
+    - multi_hot_features
+    - lightgcn_embedding
+    
+  cat: []
+  models: []
+
+
+num_epochs: 50
+early_stopping: 10
+weight_decay: 0.0008783056531097395
+dropout_rate: 0.4906275199604325
+lr: 0.002
+batch_size: 128
+num_layers: 4
+hidden_dim: 106
+target_name: score
+num_folds : 10
+
+# fold 10, 新しいパラメータでチューニング
