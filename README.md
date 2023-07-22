@@ -13,6 +13,8 @@ docker compose up
 ## final submission
 
 ```sh
+python 209_optuna.py lgb=lgb200_030.yaml
+python 200_ lgb=lgb200_030.yaml
 
 # 夜用
 python 100_lgb.py lgb=lgb100_021 # 多分1回2.5時間くらいかかる
