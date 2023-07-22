@@ -13,7 +13,10 @@ docker compose up
 ## final submission
 
 ```sh
-python 100_lgb.py lgb=base003 # fold0: 1.12155 以上かどうか
+python 100_lgb.py lgb=lgb100_021
+python 011_svdpp.py surprise=surprise011
+
+
 ```
 
 どのようなアンサンブルを行うか
@@ -29,16 +32,15 @@ python 100_lgb.py lgb=base003 # fold0: 1.12155 以上かどうか
     [x] fold数の調整: 10
     [x] 学習率を下げる
   [] LightGBM targetあり (101_lgb_target.py): `python 101_lgb_target.py lgb=lgb100_021`
-  [] GCN (062_gcn.py) : `python 063_gcn.py gcn=gcn060_003`
-    [] パラメータ調整 : `bash gcn.sh`
+  [] GCN (062_gcn.py) : `python 064_gcn.py gcn=gcn060_005`
+    [x] パラメータ調整 : `bash gcn.sh`
     [x] 特徴量の確定
-    [] fold数の調整: 10
+    [x] fold数の調整: 10
     [] 学習率を下げる
   [] CF系  (010_surprise): `python 011_svdpp.py surprise=surprise011`
-    [] パラメータ調整  `bash surprise.sh`
+    [x] パラメータ調整
     [x] 特徴量の確定
-    [] fold数の調整: 10
-    [] 学習率を下げる
+    [x] fold数の調整: 10
   [] NN  (034_nn.py):
     [] fold数の調整: 10
     [] 学習率を下げる

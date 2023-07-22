@@ -5,7 +5,6 @@ hidden_channelss=(
 )
 num_layerss=(
   "2"
-  "3"
   "5"
   "7"
   "9"
