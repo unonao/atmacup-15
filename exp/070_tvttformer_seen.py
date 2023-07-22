@@ -66,7 +66,7 @@ class UserDataset(Dataset):
     def __getitem__(self, idx):
         """
         出力したいもの
-        - input_tensor: user_id, anime_id 系列　を結合したもの
+        - input_tensor: user_id, anime_id 系列を結合したもの
         - mode_tensor: user_idか、train用の anime_id か、validation用のanime_idか、test用のanime_id かを判断するためのもの。
         損失計算の対象を決めるために設定する。{user_id: 0, train:1, valid:2, test:3}
         - attention_mask: 計算対象外のpaddingの位置をtransformerに教えるために必要
@@ -85,6 +85,7 @@ class UserDataset(Dataset):
 
         pad_length = self.max_padding - anime_tensor.size(0)
 
+        """
         # unseen用 (user_tensorは入れない）
         attention_mask = torch.zeros([self.max_padding, self.max_padding], dtype=torch.bool)
         attention_mask[: anime_tensor.size(0), : anime_tensor.size(0)] = True
@@ -121,7 +122,6 @@ class UserDataset(Dataset):
                 torch.zeros(pad_length, dtype=torch.float),
             )
         )
-        """
         sample = {
             "user_ids": user_tensor,
             "input_tensor": input_tensor,
@@ -160,12 +160,13 @@ class TransformerModel(nn.Module):
         self.fc = nn.Sequential(nn.Linear(hidden_size, hidden_size), nn.ReLU(), nn.Linear(hidden_size, 1))
 
     def forward(self, x: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+        """
         x = self.anime_embedding(x[:, :])
-        """ seen用
+        """
+        # seen用
         user_x = self.user_embedding(x[:, 0:1])
         anime_x = self.anime_embedding(x[:, 1:])
         x = torch.cat([user_x, anime_x], dim=1)
-        """
         x = self.transformer_encoder(x, attention_mask)
         output = self.fc(x).squeeze(2)
         return output
@@ -329,12 +330,12 @@ def main(config: DictConfig) -> None:
                 data["mode_tensor"] = data["mode_tensor"].detach().cpu().numpy()
                 output = output.detach().cpu().numpy()
 
+                """
                 user_tensor = np.copy(data["input_tensor"])
                 user_tensor[:, :] = data["user_ids"][:, 0:1]  # user_id の値を突っ込む
                 """
                 user_tensor = np.copy(data["input_tensor"])
                 user_tensor[:, 1:] = user_tensor[:, 0:1]
-                """
 
                 pred_dict_val["user_label"].append(user_tensor[data["mode_tensor"] == 2])
                 pred_dict_val["anime_label"].append(data["input_tensor"][data["mode_tensor"] == 2])

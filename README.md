@@ -13,6 +13,8 @@ docker compose up
 ## final submission
 
 ```sh
+python 070_tvttformer_seen.py tvtt=base
+python 080_tvttformer_unseen.py tvtt=base
 
 # 夜用
 python 100_lgb.py lgb=lgb100_021 # 多分1回2.5時間くらいかかる
