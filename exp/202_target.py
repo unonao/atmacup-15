@@ -31,7 +31,7 @@ def seed_everything(seed=1234):
 
 @hydra.main(version_base=None, config_path="../yamls", config_name="config")
 def main(config: DictConfig) -> None:
-    seed_everything()
+    seed_everything(config.seed)
     exp_name = f"{Path(sys.argv[0]).stem}/{str(uuid.uuid1())[:8]}"
     output_path = Path(f"../output/{exp_name}")
     os.makedirs(output_path, exist_ok=True)

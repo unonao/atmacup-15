@@ -67,7 +67,7 @@ def objective(trial, X, y, train_user_ids, config):
         model_lgb = lgb.train(
             lgb_params,
             lgb_train,
-            num_boost_round=1000,
+            num_boost_round=5000,
             valid_sets=[lgb_val],
             callbacks=[lgb.early_stopping(stopping_rounds=100), LightGBMPruningCallback(trial, "rmse")],
         )
@@ -91,7 +91,7 @@ def main(config: DictConfig) -> None:
     sub = load_sample_sub()
     train_user_ids = load_target("user_id")
 
-    n_trials = 100
+    n_trials = 50
     if config.debug:
         sample_index = X_train_all.sample(100).index
         X_train_all = X_train_all.iloc[sample_index].reset_index(drop=True)

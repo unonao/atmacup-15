@@ -1,10 +1,8 @@
 seen:
   # lightgcn
-  - 000_baseline/14522c68 # 2層 python 000_baseline.py  train=base006
-  # python 000_baseline.py  train=base007
-  - 000_baseline/f41f4108 # 1.1467421499361026 lightgcn layer 5 lr 0.005
-  # - 000_baseline/7c5ddab4 # 1.147 lightgcn layer 5 lr 0.002
-  
+  - 000_baseline/14522c68 # 1.145 2層 python 000_baseline.py  train=base006
+  - 000_baseline/6dd50b78 # 1.145 5層 python 000_baseline.py  train=base007
+
   # hetero-gcn
   - 064_gcn/ef59ebd2 # 2層 1.137 python 064_gcn.py gcn=gcn060_005
   - 064_gcn/3992e11c # 2層 1.137 python 064_gcn.py gcn=gcn060_006 

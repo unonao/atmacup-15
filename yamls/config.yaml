@@ -7,6 +7,7 @@ defaults:
   - nn: nn040
   - st: st050_001
   - gcn: base
+  - tvtt: base
   - override hydra/job_logging: none # hydraで自動的にログファイルが生成されるのを防ぐ
 
 debug: False
