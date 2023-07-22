@@ -13,10 +13,10 @@ docker compose up
 ## final submission
 
 ```sh
-python 100_lgb.py lgb=lgb100_021
-python 101_lgb_target.py lgb=lgb100_021
-python 011_svdpp.py surprise=surprise011
 
+# 夜用
+python 100_lgb.py lgb=lgb100_021 # 多分1回2.5時間くらいかかる
+python 101_lgb_target.py lgb=lgb100_021
 ```
 
 どのようなアンサンブルを行うか
@@ -26,7 +26,7 @@ python 011_svdpp.py surprise=surprise011
     [x] パラメータ調整
     [x] fold数の調整: 10
     [x] 学習率を下げる（もっと下げる。。。？）
-  [] GCN (062_gcn.py) : `python 064_gcn.py gcn=gcn060_005`
+  [x] GCN (062_gcn.py) : `python 064_gcn.py gcn=gcn060_005`
     [x] パラメータ調整 : `bash gcn.sh`
     [x] 特徴量の確定
     [x] fold数の調整: 10
@@ -37,13 +37,13 @@ python 011_svdpp.py surprise=surprise011
     [x] fold数の調整: 10
     [x] 学習率を下げる
   [] LightGBM targetあり (101_lgb_target.py): `python 101_lgb_target.py lgb=lgb100_021`
-  [] CF系  (010_surprise): `python 011_svdpp.py surprise=surprise011`
-    [x] パラメータ調整
-    [x] 特徴量の確定
-    [x] fold数の調整: 10
   [] NN  (034_nn.py):
     [] fold数の調整: 10
     [] 学習率を下げる
+  [x] CF系  (010_surprise): `python 011_svdpp.py surprise=surprise011`
+    [x] パラメータ調整
+    [x] 特徴量の確定
+    [x] fold数の調整: 10
 - unseen
   - LightGBM target無し : (201_strutify_importance.py)
     [ ] パラメータ調整

@@ -1,0 +1,7 @@
+id: base006
+lr: 0.002
+embedding_dim: 4096
+num_layers: 5
+num_epochs: 1000
+early_stopping: 50
+num_folds : 15
