@@ -36,7 +36,6 @@ pd.set_option("display.max_columns", 50)
 sys.path.append(os.pardir)
 
 from utils import evaluate_score, load_datasets, load_sample_sub, load_target
-from utils.embedding import TextEmbedder
 
 
 def seed_everything(seed=1234):
@@ -105,8 +104,8 @@ class UserDataset(Dataset):
 
         """
         # seen用
-        attention_mask = torch.zeros([self.max_padding + 1, self.max_padding + 1], dtype=torch.bool)
-        attention_mask[: anime_tensor.size(0) + 1, : anime_tensor.size(0) + 1] = True
+        attention_mask = torch.zeros([self.max_padding], dtype=torch.bool)
+        attention_mask[: anime_tensor.size(0)] = True
         input_tensor = torch.cat((user_tensor, anime_tensor, torch.zeros(pad_length, dtype=torch.int32)))
         mode_tensor = torch.cat(
             (
@@ -234,13 +233,12 @@ def main(config: DictConfig) -> None:
         scaler: GradScaler,
     ):
         start_time = time.time()
-        progress_bar = tqdm(dataloader, dynamic_ncols=True)
 
         model.train()
         torch.set_grad_enabled(True)
 
         meters = {"loss_avg": AverageMeter()}
-        for step, data in enumerate(progress_bar):
+        for step, data in enumerate(dataloader):
             for k, v in data.items():
                 data[k] = v.to(device)
 
@@ -270,11 +268,6 @@ def main(config: DictConfig) -> None:
                 count_steps += 1
 
             meters["loss_avg"].update(loss.item(), dataloader.batch_size)
-            progress_bar.set_description(
-                f"train: loss(step): {loss.item():.5f}"
-                + f" loss(avg): {meters['loss_avg'].avg:.5f}"
-                + f" lr: {optimizer.param_groups[0]['lr']:.6f}"
-            )
 
         return (meters["loss_avg"].avg, (time.time() - start_time) / 60)
 
@@ -284,7 +277,6 @@ def main(config: DictConfig) -> None:
         dataloader: torch.utils.data.DataLoader,
     ) -> Tuple[np.ndarray, float, float]:
         start_time = time.time()
-        progress_bar = tqdm(dataloader, dynamic_ncols=True)
 
         model.eval()
         torch.set_grad_enabled(False)
@@ -292,7 +284,7 @@ def main(config: DictConfig) -> None:
         meters = {"loss_avg": AverageMeter()}
         preds = []
         with torch.no_grad():
-            for step, data in enumerate(progress_bar):
+            for step, data in enumerate(dataloader):
                 for k, v in data.items():
                     data[k] = v.to(device)
                 output = model(data["input_tensor"], data["attention_mask"])
@@ -300,9 +292,6 @@ def main(config: DictConfig) -> None:
                     loss = model.get_losses(output, data["score_tensor"], data["mode_tensor"], 2)
                     preds.append(output.detach().cpu().numpy())
                     meters["loss_avg"].update(loss.item(), dataloader.batch_size)
-                    progress_bar.set_description(
-                        f"  val: loss(step): {loss.item():.5f}" + f" loss(avg): {meters['loss_avg'].avg:.5f}"
-                    )
 
         preds = np.concatenate(preds, axis=0)
         return (preds, meters["loss_avg"].avg, (time.time() - start_time) / 60)
@@ -412,7 +401,7 @@ def main(config: DictConfig) -> None:
         # Training
         count_steps = 0
         early_stopping_counter = 0
-        for epoch in range(1, config.tvtt.n_epochs + 1 if config.debug is False else 2):
+        for epoch in tqdm(range(1, config.tvtt.n_epochs + 1 if config.debug is False else 2)):
             train_loss, train_time = train_one_epoch(
                 config.tvtt,
                 count_steps,
@@ -425,7 +414,7 @@ def main(config: DictConfig) -> None:
                 scaler=scaler,
             )
             val_preds, val_loss, val_time = val_one_epoch(cfg=config.tvtt, model=model, dataloader=eval_loader)
-            print(f"Epoch {epoch} : Train loss {train_loss:.3f} Val loss: {val_loss:.3f}")
+            tqdm.write(f"Epoch {epoch} : Train loss {train_loss:.3f} Val loss: {val_loss:.3f}")
             wandb.log(
                 {"epoch": epoch, f"nn/train_loss/fold-{fold}": train_loss, f"nn/valid_loss/fold-{fold}": val_loss}
             )
