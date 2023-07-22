@@ -167,7 +167,7 @@ class TransformerModel(nn.Module):
         user_x = self.user_embedding(x[:, 0:1])
         anime_x = self.anime_embedding(x[:, 1:])
         x = torch.cat([user_x, anime_x], dim=1)
-        x = self.transformer_encoder(x, attention_mask)
+        x = self.transformer_encoder(x, src_key_padding_mask=attention_mask)
         output = self.fc(x).squeeze(2)
         return output
 

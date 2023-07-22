@@ -166,7 +166,7 @@ class TransformerModel(nn.Module):
         anime_x = self.anime_embedding(x[:, 1:])
         x = torch.cat([user_x, anime_x], dim=1)
         """
-        x = self.transformer_encoder(x, attention_mask)
+        x = self.transformer_encoder(x)
         output = self.fc(x).squeeze(2)
         return output
 
