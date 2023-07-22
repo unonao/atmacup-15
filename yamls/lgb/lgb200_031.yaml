@@ -1,5 +1,5 @@
 # ここから features/create.py を破壊的に置き換え
-id: lgb200_030
+id: lgb200_031
 
 feats:
   num:
@@ -22,14 +22,14 @@ feats:
   models: [] # 学習済みモデルの結果を使う
 
 target_name: score
-num_folds : 5
+num_folds : 10
 
 params: 
   objective: regression
   metric: rmse
   verbosity: -1
   boosting_type: gbdt
-  learning_rate: 0.02
+  learning_rate: 0.01
   num_leaves: 455
   min_child_samples: 100
   max_depth: -1

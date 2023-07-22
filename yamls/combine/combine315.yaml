@@ -26,7 +26,6 @@ unseen:
   - 201_stratify_importance/d56c02ca # 1.364 python 201_stratify_importance.py lgb=lgb200_030
   - 201_stratify_importance/3b936df6 # 1.36179  python 201_stratify_importance.py lgb=lgb200_031
   - 202_target/c982c60e # target encode lgb 1.36336
-  # python 202_target.py lgb=lgb200_030
   # python 202_target.py lgb=lgb200_031
   - 041_nn_unseen_scheduler/81fb0f42 # 1.384 NN
   - 042_nn/3c02d842 # 1.385029073565259 NN

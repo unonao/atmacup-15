@@ -1,7 +1,7 @@
 n_epochs : 200
-n_splits : 10
+early_stopping: 10
+num_folds: 5
 batch_size : 16
-num_workers : 10
 init_lr : 1e-4
 final_lr : 1e-6
 warmup_lr_init : 1e-6
@@ -11,3 +11,11 @@ beta :
   - 0.9
   - 0.998
 clip_grad_norm : 10
+accumulation_steps : 1
+use_amp: true
+
+hidden_size: 128
+nhead: 4
+dim_feedforward: 1024
+
+num_tts: 2
