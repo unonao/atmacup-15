@@ -15,7 +15,7 @@ docker compose up
 - lightgcn, unseen nn は対してスコアアップしなくなったので完了でOK
 
 - [x] python 100_lgb.py lgb=lgb100_021 seed=12
-- [] python 034_nn.py nn=nn034_003 seed=17
+- [x] python 034_nn.py nn=nn034_003 seed=17
 - [] python 101_lgb_target.py lgb=lgb100_021 seed=14
 - []  python 201_stratify_importance.py lgb=lgb200_030 seed=15
 - []  python 202_target.py lgb=lgb200_031 seed=16
@@ -46,7 +46,7 @@ docker compose up
 unseenモデルをseenモデルと一緒に突っ込んでアンサンブル
 
 ```sh
-python 303_combine.py combine=combine318
+python 303_combine.py combine=combine323
 python 304_combine.py combine=combine317 +model=linear
 ```
 

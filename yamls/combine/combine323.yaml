@@ -21,6 +21,8 @@ seen:
   - 101_lgb_target/35bc4eb6 # 1.10336 target  
   - 101_lgb_target/718c9a84 # python 101_lgb_target.py lgb=lgb100_021
 
+  - 100_lgb/b89f04f0 # 強い
+
   # nn
   - 034_nn/ac24d22c # 1.143
   - 034_nn/7690d61a # 1.161
@@ -40,7 +42,6 @@ seen:
   - 010_surprise/cc507138 # 1.21 BaselineOnly
   - 010_surprise/7027401c # 1.199 SlopeOne
   - 010_surprise/ff720d44 # 1.24 CoClustering
-
 unseen:
   - 201_stratify_importance/950741e2 # 1.3659
   - 201_stratify_importance/a8411db8 # 1.367
@@ -76,4 +77,5 @@ unseen:
   #- 020_surprise_unseen/72a42a50 # 1.563 KNNBasic
   - 080_tvttformer_unseen/808a63d8
 
-# predicted score2: 1.1433659730584838
+# predicted score2: 1.1420587117670442
+# predicted score2: 1.1427519282754885 (group)
