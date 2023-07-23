@@ -16,4 +16,3 @@ RUN pip install --no-cache-dir \
 
 # version 2.4以上
 RUN pip install git+https://github.com/pyg-team/pytorch_geometric.git 
-RUN pip install git+https://github.com/unonao/kamiggle.git
