@@ -1,0 +1,26 @@
+
+id: gcn060_009
+feats:
+  num:
+    - duration_episodes #duration
+    - genres
+    - user_num
+    - aired
+    - japanese_name
+    - other_string
+    - string_len
+    - implicit_factors_bpr
+    - multi_hot_features
+    - text_embedding
+    
+  cat: []
+  models:  []
+
+
+num_epochs: 1000
+early_stopping: 50
+lr: 0.001
+num_layers: 2
+hidden_channels: 256 # 256
+target_name: score
+num_folds : 10
