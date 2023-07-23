@@ -1,0 +1,43 @@
+seen:
+  # lightgcn
+  - 000_baseline/8465fe04 # 1.145 python 000_baseline.py  train=base006 seed=2
+  - 000_baseline/6dd50b78 # 1.145 5層 python 000_baseline.py  train=base007
+  - 000_baseline/c3a00906
+
+  # hetero-gcn
+  - 064_gcn/3992e11c # 2層 1.137 python 064_gcn.py gcn=gcn060_006 
+  - 064_gcn/380d2a1a # 2層 20fold python 064_gcn.py gcn=gcn060_008
+  - 064_gcn/0253280e # 5層 python 064_gcn.py gcn=gcn060_007
+  - 064_gcn/61424f48 # 1.13614 python 064_gcn.py gcn=gcn060_006 seed=10
+
+  # lgb
+  - 100_lgb/3b021e78 # 1.11
+  - 100_lgb/43bd8ccc # 1.095 lgb python 100_lgb.py lgb=lgb100_021 
+  - 101_lgb_target/8331ef28 # 1.116 target encode lgb
+  - 101_lgb_target/35bc4eb6 # 1.10336 target  
+  - 101_lgb_target/718c9a84 # python 101_lgb_target.py lgb=lgb100_021
+  - 100_lgb/b89f04f0 # 強い python 100_lgb.py lgb=lgb100_021 seed=12
+  - 101_lgb_target/c6f6abd2 #  python 101_lgb_target.py lgb=lgb100_021 seed=14
+  - 101_lgb_target_epoch/1eacb69e # python 101_lgb_target_epoch.py lgb=lgb100_023 seed=19
+  - 100_lgb_epoch/98938d5e # python 100_lgb_epoch.py lgb=lgb100_022 seed=12 
+
+  # nn
+
+unseen:
+  - 201_stratify_importance/950741e2 # 1.3659
+  - 201_stratify_importance/a8411db8 # 1.367
+  - 201_stratify_importance/80fa656c # 1.36364
+  - 201_stratify_importance/d56c02ca # 1.364 python 201_stratify_importance.py lgb=lgb200_030
+  - 201_stratify_importance/3b936df6 # 1.36179  python 201_stratify_importance.py lgb=lgb200_031
+  - 202_target/c982c60e # target encode lgb 1.36336
+  - 202_target/330c67fe # 1.36089  python 202_target.py lgb=lgb200_031
+
+  # nn
+  - 042_nn/003fdb90 # 1.402
+  - 042_nn/3c02d842 # 1.385029073565259 NN
+  - 041_nn_unseen_scheduler/efd018ec
+  - 042_nn/858cd5e6 #  python 042_nn.py nn=nn042_003 seed=8
+
+
+# predicted score2: 1.1411492302301216
+# predicted score2: 1.141842998887827
