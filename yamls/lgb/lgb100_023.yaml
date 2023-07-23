@@ -18,7 +18,7 @@ feats:
 
 
 target_name: score
-num_folds : 4
+num_folds : 6
 
 params: 
   objective: regression

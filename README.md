@@ -18,7 +18,7 @@ docker compose up
 - [x]  python 202_target.py lgb=lgb200_031 seed=16
 - []  python 100_lgb_epoch.py lgb=lgb100_022 seed=12 # epoch数ブースト（想定時間は3h）fold6
 - []  python 201_stratify_importance.py lgb=lgb200_030 seed=15
-- []  python 101_lgb_target_ecpoch.py lgb=lgb100_023 seed=19 # epoch数ブースト（想定時間は2h）fold4
+- []  python 101_lgb_target_ecpoch.py lgb=lgb100_023 seed=19 # epoch数ブースト（想定時間は3h）fold6
 - []  python 064_gcn.py gcn=gcn060_009 seed=18
 - [x] python 000_baseline.py  train=base006 seed=2
 - [x] python 000_baseline.py  train=base007 seed=2
