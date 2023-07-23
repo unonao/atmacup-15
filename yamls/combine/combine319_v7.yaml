@@ -1,0 +1,61 @@
+seen:
+  # lightgcn
+  - 000_baseline/14522c68 # 1.145 2層 python 000_baseline.py  train=base006
+  - 000_baseline/6dd50b78 # 1.145 5層 python 000_baseline.py  train=base007
+
+  # hetero-gcn
+  - 064_gcn/ef59ebd2 # 2層 1.137 python 064_gcn.py gcn=gcn060_005
+  - 064_gcn/3992e11c # 2層 1.137 python 064_gcn.py gcn=gcn060_006 
+  - 064_gcn/380d2a1a # 2層 20fold python 064_gcn.py gcn=gcn060_008
+  - 064_gcn/0253280e # 5層 python 064_gcn.py gcn=gcn060_007
+
+  # lgb
+  - 100_lgb/a47bfbf2 # 1.10106 lgb
+  - 100_lgb/a7e26006 # 1.10375 lgb
+  - 100_lgb/3b021e78 # 1.11
+  - 100_lgb/43bd8ccc # 1.095 lgb python 100_lgb.py lgb=lgb100_021 
+  - 101_lgb_target_epoch/fb003d14 # 101_lgb_target/8331ef28 # 1.116 target encode lgb
+  - 101_lgb_target/35bc4eb6 # 1.10336 target  
+  - 034_nn/ac24d22c # 1.143
+
+ # - 034_nn/7690d61a # 1.161
+ # - 033_nn/1ba19fea # 1.147
+ # - 031_nn_seen_scheduler/60d2e178  # 1.165
+  #- 031_nn_seen_scheduler/a766a70c # 1.226
+  #- 031_nn_seen_scheduler/a80961ee # 1.22
+  - 101_lgb_target/718c9a84 # python 101_lgb_target.py lgb=lgb100_021
+
+  # surprise
+  - 011_svdpp/19de0d2e # 1.165 SVDpp python 011_svdpp.py surprise=surprise011
+  - 010_surprise/277704d6 # 1.203 SVD
+  - 010_surprise/bad2980e # 1.202 KNNWithZScore
+  - 010_surprise/51c879fa # 1.209 KNNWithMeans
+  - 010_surprise/f01160fa # 1.319 KNNBasic
+  - 010_surprise/cc507138 # 1.21 BaselineOnly
+  - 010_surprise/7027401c # 1.199 SlopeOne
+  - 010_surprise/ff720d44 # 1.24 CoClustering
+unseen:
+  - 201_stratify_importance/950741e2 # 1.3659
+  - 201_stratify_importance/a8411db8 # 1.367
+  - 201_stratify_importance/80fa656c # 1.36364
+  - 201_stratify_importance/d56c02ca # 1.364 python 201_stratify_importance.py lgb=lgb200_030
+  - 201_stratify_importance/3b936df6 # 1.36179  python 201_stratify_importance.py lgb=lgb200_031
+  - 202_target/c982c60e # target encode lgb 1.36336
+  - 202_target/330c67fe # python 202_target.py lgb=lgb200_031 1.36089
+  - 041_nn_unseen_scheduler/81fb0f42 # 1.384 NN
+  - 042_nn/3c02d842 # 1.385029073565259 NN
+  - 050_set_transformer/4d2e1dce #  1.4293341993855615
+
+  # surprise
+  - 020_surprise_unseen/4ed7afa2 # 1.441 BaselineOnly
+  - 020_surprise_unseen/2cea0176 # 1.563 CoClustering
+  - 020_surprise_unseen/d97af2c0 # 1.441 KNNBaseline
+  - 020_surprise_unseen/78c0b3a2 # 1.563 SlopeOne
+  - 020_surprise_unseen/8275dac2 # 1.447 SVDpp
+  - 020_surprise_unseen/5e4526f8 # 1.442 SVD
+  - 020_surprise_unseen/53aa74ea # 1.563 NMF
+  - 020_surprise_unseen/0ccfa6ae #1.563 KNNWithZScore
+  - 020_surprise_unseen/bda353f0 # 1.563 KNNWithMeans
+  - 020_surprise_unseen/72a42a50 # 1.563 KNNBasic
+  
+# group predicted score2: 1.1450361856035551
