@@ -14,9 +14,7 @@ docker compose up
 
 - lightgcn, unseen nn は対してスコアアップしなくなったので完了でOK
 
-- [x] python 100_lgb.py lgb=lgb100_021 seed=12
-- [x] python 034_nn.py nn=nn034_003 seed=17
-- [] python 101_lgb_target.py lgb=lgb100_021 seed=14
+- [x] python 101_lgb_target.py lgb=lgb100_021 seed=14
 - []  python 201_stratify_importance.py lgb=lgb200_030 seed=15
 - []  python 202_target.py lgb=lgb200_031 seed=16
 - [] python 064_gcn.py gcn=gcn060_006 seed=10
@@ -28,6 +26,8 @@ docker compose up
 - [x] python 042_nn.py nn=nn042_004 seed=13
 - [x] python 034_nn.py nn=nn034_001 seed=9
 - [x] python 034_nn.py nn=nn034_002 seed=16
+- [x] python 100_lgb.py lgb=lgb100_021 seed=12
+- [x] python 034_nn.py nn=nn034_003 seed=17
 
 やること
 
