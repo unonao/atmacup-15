@@ -18,11 +18,11 @@ seen:
   - 101_lgb_target/35bc4eb6 # 1.10336 target  
   - 034_nn/ac24d22c # 1.143
 
-  - 034_nn/7690d61a # 1.161
-  - 033_nn/1ba19fea # 1.147
-  - 031_nn_seen_scheduler/60d2e178  # 1.165
-  - 031_nn_seen_scheduler/a766a70c # 1.226
-  - 031_nn_seen_scheduler/a80961ee # 1.22
+ # - 034_nn/7690d61a # 1.161
+ # - 033_nn/1ba19fea # 1.147
+ # - 031_nn_seen_scheduler/60d2e178  # 1.165
+  #- 031_nn_seen_scheduler/a766a70c # 1.226
+  #- 031_nn_seen_scheduler/a80961ee # 1.22
   - 101_lgb_target/718c9a84 # python 101_lgb_target.py lgb=lgb100_021
 
   # surprise
@@ -53,9 +53,9 @@ unseen:
   - 020_surprise_unseen/78c0b3a2 # 1.563 SlopeOne
   - 020_surprise_unseen/8275dac2 # 1.447 SVDpp
   - 020_surprise_unseen/5e4526f8 # 1.442 SVD
-  #- 020_surprise_unseen/53aa74ea # 1.563 NMF
-  #- 020_surprise_unseen/0ccfa6ae #1.563 KNNWithZScore
-  #- 020_surprise_unseen/bda353f0 # 1.563 KNNWithMeans
-  #- 020_surprise_unseen/72a42a50 # 1.563 KNNBasic
+  - 020_surprise_unseen/53aa74ea # 1.563 NMF
+  - 020_surprise_unseen/0ccfa6ae #1.563 KNNWithZScore
+  - 020_surprise_unseen/bda353f0 # 1.563 KNNWithMeans
+  - 020_surprise_unseen/72a42a50 # 1.563 KNNBasic
   
 # predicted score2: 1.1447353013220625
