@@ -21,7 +21,11 @@ from lightgbm import LGBMRegressor
 sys.path.append(os.pardir)
 from utils import load_datasets, load_target, evaluate_score, load_sample_sub
 
-model_dict = {"linear": LinearRegression(), "elastic": ElasticNet(alpha=0.1, l1_ratio=0.1), "lgb": LGBMRegressor()}
+model_dict = {
+    "linear": LinearRegression(),
+    "elastic": ElasticNet(alpha=0.1, l1_ratio=0.1),
+    "lgb": LGBMRegressor(),
+}
 
 
 def load_models(config, model_names, y_true):
