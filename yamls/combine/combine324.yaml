@@ -22,6 +22,7 @@ seen:
   - 101_lgb_target/35bc4eb6 # 1.10336 target  
   - 101_lgb_target/718c9a84 # python 101_lgb_target.py lgb=lgb100_021
   - 100_lgb/b89f04f0 # 強い python 100_lgb.py lgb=lgb100_021 seed=12
+  - 101_lgb_target/c6f6abd2 #  python 101_lgb_target.py lgb=lgb100_021 seed=14
 
   # nn
   - 034_nn/ac24d22c # 1.143
@@ -81,5 +82,5 @@ unseen:
   
   - 080_tvttformer_unseen/808a63d8
 
-# predicted score2: 1.1418757680829652
-# predicted score2: 1.1425690955865244
+# predicted score2: 1.141328340025752
+# predicted score2: 1.142021999875784

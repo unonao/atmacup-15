@@ -12,11 +12,10 @@ docker compose up
 
 ## final submission
 
-- lightgcn, unseen nn は対してスコアアップしなくなったので完了でOK
+- lightgcn, unseen nn, unseen lgb は対してスコアアップしなくなったので完了でOK
 
 - [x] python 101_lgb_target.py lgb=lgb100_021 seed=14
-- [x]  python 202_target.py lgb=lgb200_031 seed=16
-- []  python 100_lgb_epoch.py lgb=lgb100_022 seed=12 # epoch数ブースト（想定時間は3h）fold6
+- [x]  python 100_lgb_epoch.py lgb=lgb100_022 seed=12 # epoch数ブースト（想定時間は3h）fold6
 - []  python 201_stratify_importance.py lgb=lgb200_030 seed=15
 - []  python 101_lgb_target_ecpoch.py lgb=lgb100_023 seed=19 # epoch数ブースト（想定時間は3h）fold6
 - []  python 064_gcn.py gcn=gcn060_009 seed=18
@@ -31,6 +30,7 @@ docker compose up
 - [x] python 042_nn.py nn=nn042_004 seed=13
 - [x] python 034_nn.py nn=nn034_003 seed=17
 - [x] python 064_gcn.py gcn=gcn060_007 seed=11
+- [x]  python 202_target.py lgb=lgb200_031 seed=16 # 効かなかった
 
 やること
 
