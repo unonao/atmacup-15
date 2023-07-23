@@ -12,11 +12,42 @@ docker compose up
 
 ## final submission
 
+- lightgcn, unseen nn は対してスコアアップしなくなったので完了でOK
+
+- [x] python 100_lgb.py lgb=lgb100_021 seed=12
+- [] python 034_nn.py nn=nn034_003 seed=17
+- [] python 101_lgb_target.py lgb=lgb100_021 seed=14
+- []  python 201_stratify_importance.py lgb=lgb200_030 seed=15
+- []  python 202_target.py lgb=lgb200_031 seed=16
+- [] python 064_gcn.py gcn=gcn060_006 seed=10
+- [] python 064_gcn.py gcn=gcn060_006 seed=11
+- [x] python 000_baseline.py  train=base006 seed=2
+- [x] python 000_baseline.py  train=base007 seed=2
+- [x] python 042_nn.py nn=nn042_003 seed=8
+- [x] python 042_nn.py nn=nn042_003 seed=8
+- [x] python 042_nn.py nn=nn042_004 seed=13
+- [x] python 034_nn.py nn=nn034_001 seed=9
+- [x] python 034_nn.py nn=nn034_002 seed=16
+
+やること
+
+- 時間掛かるが効きそう
+  - seen lgb
+  - seen lgb target
+  - unseen lgb
+  - unseen lgb target
+- それほど時間もかからないしそこそこ効きそう
+  - unseen nn: python 042_nn.py nn=nn042_003 seed=8
+  - seen gcn: python 064_gcn.py gcn=gcn060_006 seed=10
+  - seen nn: python 034_nn.py nn=nn034_001 seed=9
+  - seen baseline: python 000_baseline.py  train=base006 seed=2
+  - unseen st
+
+unseenモデルをseenモデルと一緒に突っ込んでアンサンブル
+
 ```sh
 python 303_combine.py combine=combine318
 python 304_combine.py combine=combine317 +model=linear
-python 070_tvttformer_seen.py tvtt=base
-python 080_tvttformer_unseen.py tvtt=base
 ```
 
 どのようなアンサンブルを行うか
